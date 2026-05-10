@@ -3,9 +3,9 @@ session_start();
 
 // ----------------------------------------------------------------------------------------------db
 $servername = "localhost";
-$username = "";
-$password = "";
-$dbname = "";
+$username = "mixice";
+$password = "mixice";
+$dbname = "mixice";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 

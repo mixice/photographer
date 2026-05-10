@@ -23,7 +23,7 @@ $comments = $conn->query("SELECT * FROM comment WHERE status=1 ORDER BY created_
     </section>
     <?php if ($home_ticket): ?><div class="ticket absolute-5 center anime-fade-in-up"><?php echo $home_ticket; ?></div><?php endif; ?>
     <div class="light-logo absolute-2 anime-fade-in-down"><i class="ico ico-m"></i></div>
-    <div class="light-txt absolute-7 anime-fade-in-up"><h3><?php echo $title; ?><br>photographer</h3><span>Freeze the important moments in life</span></div>
+    <div class="light-txt absolute-7 anime-fade-in-up"><h3><?php echo $site_title; ?><br>photographer</h3><span>Freeze the important moments in life</span></div>
     <div class="light-sns absolute-9 center anime-fade-in">
         <a pop="pop" class="ico ico-douyin"></a>
         <a pop="pop" class="ico ico-wechat"></a>
