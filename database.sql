@@ -73,6 +73,7 @@ DROP TABLE IF EXISTS `settings`;
 CREATE TABLE `settings` (
   `id`                 INT(10) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
   `title`              VARCHAR(200) NOT NULL DEFAULT '' COMMENT '站点标题',
+  `description`        VARCHAR(500) DEFAULT '' COMMENT '网站描述',
   `account`            VARCHAR(50) NOT NULL DEFAULT '' COMMENT '管理员账号',
   `password`           VARCHAR(255) NOT NULL DEFAULT '' COMMENT '管理员密码',
   `home_ticket`        TEXT COMMENT '首页标语',
