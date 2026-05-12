@@ -1,11 +1,13 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 // ----------------------------------------------------------------------------------------------db
 $servername = "localhost";
-$username = "mixice";
-$password = "mixice";
-$dbname = "mixice";
+$username = "";
+$password = "";
+$dbname = "";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
@@ -46,20 +48,25 @@ function renderPagination($current_page, $total_pages, $params = []) {
             <a href="?page=<?php echo $total_pages . $query_string; ?>" class="ico ico-alone-side-right"></a>
         <?php endif; ?>
         <span><?php echo $current_page . '/' . $total_pages; ?></span>
-        <input type="number" min="1" max="<?php echo $total_pages; ?>" id="pageInput" onkeypress="if(event.key === 'Enter'){ jumpToPage(); }">
-        <a class="ico ico-arrow-enter" onclick="jumpToPage()"></a>
+        <input type="number" min="1" max="<?php echo $total_pages; ?>" id="pageInput">
+        <a class="ico ico-arrow-enter" id="pageJump"></a>
     </page>
     <script>
         function jumpToPage(){
-            let pageInput = document.getElementById('pageInput').value,
-                totalPages = <?php echo $total_pages; ?>
+            var pageInput = document.getElementById('pageInput').value;
+            var totalPages = <?php echo $total_pages; ?>;
             if(pageInput >= 1 && pageInput <= totalPages){
-                let url = '?page=' + pageInput + '<?php echo $query_string; ?>'
-                window.location.href = url
+                var url = '?page=' + pageInput + '<?php echo $query_string; ?>';
+                window.location.href = url;
             } else {
-                alert("Please enter a valid page number")
+                alert("Please enter a valid page number");
             }
         }
+        document.getElementById('pageInput').onkeypress = function(event){
+            event = event || window.event;
+            if(event.key === 'Enter' || event.keyCode === 13) jumpToPage();
+        };
+        document.getElementById('pageJump').onclick = jumpToPage;
     </script>
     <?php
     return ob_get_clean();
@@ -133,6 +140,26 @@ function extractImageUrlsFromHtml($html) {
         }
     }
     return $urls;
+}
+
+function extractImageUrlsFromJson($json) {
+    $urls = [];
+    if (empty($json)) return $urls;
+    $decoded = json_decode($json, true);
+    if (!is_array($decoded)) return $urls;
+    foreach ($decoded as $url) {
+        if (is_string($url) && $url !== '') {
+            $urls[] = $url;
+        }
+    }
+    return array_values(array_unique($urls));
+}
+
+function deleteFilesByUrls($urls) {
+    foreach (array_unique(array_filter($urls)) as $url) {
+        $file = $_SERVER['DOCUMENT_ROOT'] . $url;
+        if (is_file($file)) unlink($file);
+    }
 }
 
 // ------------------------------------------------------------------------------------------ tmp move

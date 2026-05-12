@@ -77,7 +77,7 @@ if (!empty($params)) {
     </div>
 </div>
 
-<script>function del(id){confirm('Delete will remove related files and comments, confirm ?').then(r=>{if(r)location.href='page.php?action=delete&id='+id})}</script>
+<script>function del(id){confirm('Delete will remove related files and comments, confirm ?').then(function(r){if(r)location.href='page.php?action=delete&id='+id})}</script>
 
 </section>
 </section>

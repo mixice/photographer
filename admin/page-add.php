@@ -29,6 +29,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $slug = trim($_POST['slug'] ?? '');
     $content = $_POST['content'] ?? '';
     $comment_enabled = !empty($_POST['comment_enabled']) ? 1 : 0;
+    $date_input = trim($_POST['created_at'] ?? '');
+    $created_at = $date_input ? $date_input . ' ' . date('H:i:s') : date('Y-m-d H:i:s');
     $slug = preg_replace('/[^a-z0-9\-]/', '', strtolower($slug));
 
     if (empty($title) || empty($slug)) {
@@ -36,16 +38,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif ($id) {
         $content = moveTmpFiles($content, 'page');
         cleanUnusedFiles('', '', $row['content'] ?? '', $content);
-        $stmt = $conn->prepare("UPDATE page SET title=?, slug=?, content=?, comment_enabled=? WHERE id=?");
-        $stmt->bind_param("sssii", $title, $slug, $content, $comment_enabled, $id);
+        $stmt = $conn->prepare("UPDATE page SET title=?, slug=?, content=?, comment_enabled=?, created_at=? WHERE id=?");
+        $stmt->bind_param("sssisi", $title, $slug, $content, $comment_enabled, $created_at, $id);
         if ($stmt->execute()) {
             header("Location: page-add.php?id=$id&msg=saved");
             exit();
         }
     } else {
         $content = moveTmpFiles($content, 'page');
-        $stmt = $conn->prepare("INSERT INTO page (title, slug, content, comment_enabled) VALUES (?, ?, ?, ?)");
-        $stmt->bind_param("sssi", $title, $slug, $content, $comment_enabled);
+        $stmt = $conn->prepare("INSERT INTO page (title, slug, content, comment_enabled, created_at) VALUES (?, ?, ?, ?, ?)");
+        $stmt->bind_param("sssis", $title, $slug, $content, $comment_enabled, $created_at);
         if ($stmt->execute()) {
             header("Location: page-add.php?id=".$stmt->insert_id."&msg=added");
             exit();
@@ -59,6 +61,7 @@ $slug_val = htmlspecialchars($row['slug'] ?? '', ENT_QUOTES, 'UTF-8');
 $content_val = $row['content'] ?? '';
 $comment_active = ($row && $row['comment_enabled']) ? ' active' : '';
 $comment_val = ($row && $row['comment_enabled']) ? 1 : 0;
+$date_val = $row ? substr($row['created_at'], 0, 10) : date('Y-m-d');
 $heading = $id ? 'page edit' : 'page add';
 $msg = $_GET['msg'] ?? '';
 if ($msg) $msg_text = $msg === 'added' ? 'Added successfully !' : 'Saved successfully !';
@@ -73,6 +76,7 @@ if ($msg) $msg_text = $msg === 'added' ? 'Added successfully !' : 'Saved success
                 <?php if ($id): ?><input type="hidden" name="id" value="<?php echo $id; ?>"><?php endif; ?>
                 <li><span>title</span><input class="wide-80" type="text" name="title" value="<?php echo $title_val; ?>" required></li>
                 <li><span>url</span><input class="wide-40" type="text" name="slug" value="<?php echo $slug_val; ?>" required><cite id="slug-tip" class="co-red" style="display:none"></cite></li>
+                <li><span>date</span><input class="wide-20" type="date" name="created_at" value="<?php echo $date_val; ?>"></li>
                 <li><span>comment</span><label><o class="toggle<?php echo $comment_active; ?>"></o><input type="hidden" name="comment_enabled" value="<?php echo $comment_val; ?>"></label></li>
                 <li><span>content</span>
                     <textarea class="editor-upload" name="content"><?php echo $content_val; ?></textarea>

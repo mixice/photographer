@@ -13,7 +13,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = trim($_POST['title'] ?? '');
     $content = $_POST['content'] ?? '';
     $comment_enabled = !empty($_POST['comment_enabled']) ? 1 : 0;
-    $created_at = trim($_POST['created_at'] ?? '') ?: date('Y-m-d');
+    $date_input = trim($_POST['created_at'] ?? '');
+    $created_at = $date_input ? $date_input . ' ' . date('H:i:s') : date('Y-m-d H:i:s');
     $cover = $row['cover'] ?? '';
 
     // handle cover upload

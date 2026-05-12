@@ -4,7 +4,12 @@ include ('head.php');
 $type = isset($_GET['type']) ? trim($_GET['type']) : '';
 $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
-if (!in_array($type, ['photography', 'standpoint']) || $id <= 0) {
+if ($type === 'photography' && $id > 0) {
+    header("Location: album.php?id=$id");
+    exit();
+}
+
+if ($type !== 'standpoint' || $id <= 0) {
     header("Location: index.php");
     exit();
 }

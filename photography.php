@@ -20,7 +20,7 @@ $list = $conn->query("SELECT * FROM photography ORDER BY created_at DESC LIMIT $
     <ul>
         <?php if ($list->num_rows > 0): ?>
             <?php while ($row = $list->fetch_assoc()): ?>
-            <li><a href="article.php?type=photography&id=<?php echo $row['id']; ?>"><img src="<?php echo htmlspecialchars($row['cover']); ?>" cover loading="lazy"><aside><h5 class="anime-fade-in"><?php echo htmlspecialchars($row['title']); ?></h5></aside></a></li>
+            <li><a href="album.php?id=<?php echo $row['id']; ?>"><img src="<?php echo htmlspecialchars($row['cover']); ?>" cover loading="lazy"><aside><h5 class="anime-fade-in"><?php echo htmlspecialchars($row['title']); ?></h5></aside></a></li>
             <?php endwhile; ?>
         <?php endif; ?>
     </ul>

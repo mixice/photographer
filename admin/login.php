@@ -1,4 +1,5 @@
 <?php
+if (!file_exists(dirname(__DIR__) . '/install.lock')) { header('Location: ../install.php'); exit(); }
 session_start();
 require_once('../db.php');
 if ($_SERVER["REQUEST_METHOD"] == "POST") {

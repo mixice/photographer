@@ -41,7 +41,7 @@ $slug = $_GET['slug'] ?? '';
     <menu>
         <menu-cont>
             <li><a class="line<?php echo $script === 'index.php' ? ' active' : ''; ?>" href="index.php">home</a></li>
-            <li><a class="line<?php echo $script === 'photography.php' ? ' active' : ''; ?>" href="photography.php">photography</a></li>
+            <li><a class="line<?php echo in_array($script, ['photography.php', 'album.php']) ? ' active' : ''; ?>" href="photography.php">photography</a></li>
             <li><a class="line<?php echo $script === 'standpoint.php' ? ' active' : ''; ?>" href="standpoint.php">standpoint</a></li>
             <?php $pages = $conn->query("SELECT * FROM page ORDER BY id ASC"); ?>
             <?php while ($p = $pages->fetch_assoc()): ?>

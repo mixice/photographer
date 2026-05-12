@@ -14,7 +14,7 @@ CREATE TABLE `photography` (
   `id`          INT(10) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
   `title`       VARCHAR(200) NOT NULL DEFAULT '' COMMENT '作品标题',
   `cover`       VARCHAR(500) DEFAULT NULL COMMENT '封面图URL',
-  `content`     LONGTEXT COMMENT '富文本正文',
+  `images`      LONGTEXT COMMENT '相册图片JSON',
   `comment_enabled` TINYINT(1) NOT NULL DEFAULT 1 COMMENT '允许评论: 1是 0否',
   `created_at`  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   PRIMARY KEY (`id`)

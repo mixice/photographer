@@ -110,7 +110,7 @@ $list = $rows;
     </div>
 </div>
 
-<script>function del(id){confirm('Confirm delete ?').then(r=>{if(r)location.href='comment.php?action=delete&id='+id})}</script>
+<script>function del(id){confirm('Confirm delete ?').then(function(r){if(r)location.href='comment.php?action=delete&id='+id})}</script>
 
 </section>
 </section>

@@ -8,7 +8,11 @@ $keyword = isset($_GET['keyword']) ? trim($_GET['keyword']) : '';
 // delete
 if (isset($_GET['action']) && $_GET['action'] === 'delete') {
     $id = intval($_GET['id']);
-    deleteRecordWithFiles('photography', $id, ['cover'], ['content']);
+    $row = $conn->query("SELECT cover, images FROM photography WHERE id=$id")->fetch_assoc();
+    if ($row) {
+        deleteFilesByUrls(array_merge([$row['cover'] ?? ''], extractImageUrlsFromJson($row['images'] ?? '')));
+    }
+    $conn->query("DELETE FROM photography WHERE id=$id");
     $conn->query("DELETE FROM comment WHERE target_type='photography' AND target_id=$id");
     header("Location: photography.php?page=1");
     exit();
@@ -60,7 +64,7 @@ if (!empty($params)) {
                             <td><?php echo htmlspecialchars($row['title']); ?></td>
                             <td><?php if ($row['cover']): ?><em><img cover src="<?php echo htmlspecialchars($row['cover']); ?>"></em><?php endif; ?></td>
                             <td><?php echo substr($row['created_at'], 0, 10); ?></td>
-                            <td><a class="ico ico-link" href="/article.php?type=photography&id=<?=$row['id']?>" target="_blank"></a>
+                            <td><a class="ico ico-link" href="/album.php?id=<?=$row['id']?>" target="_blank"></a>
                                 <a class="ico ico-edit co-green" href="photography-add.php?id=<?php echo $row['id']; ?>"></a>
                                 <button class="ico ico-delete co-red" onclick="del(<?=$row['id']?>)"></button>
                             </td>
@@ -76,7 +80,7 @@ if (!empty($params)) {
     </div>
 </div>
 
-<script>function del(id){confirm('Delete will remove related files and comments, confirm ?').then(r=>{if(r)location.href='photography.php?action=delete&id='+id})}</script>
+<script>function del(id){confirm('Delete will remove related files and comments, confirm ?').then(function(r){if(r)location.href='photography.php?action=delete&id='+id})}</script>
 
 </section>
 </section>
