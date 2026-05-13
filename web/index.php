@@ -17,7 +17,7 @@ $comments = $conn->query("SELECT * FROM comment WHERE status=1 ORDER BY created_
 <section class="light">
     <section class="swiper swiper-banner">
         <div class="swiper-wrapper">
-        <?php $selected = array_rand(range(0, 25), 3);foreach($selected as $n) {echo '<div class="swiper-slide"><img src="images/light/' . $n . '.jpg" cover loading="lazy"></div>';}?>
+        <?php $selected = array_rand(range(0, 20), 3);foreach($selected as $n) {echo '<div class="swiper-slide"><img src="images/light/' . $n . '.jpg" cover loading="lazy"></div>';}?>
         </div>
     </section>
     <?php if ($home_ticket): ?><div class="ticket absolute-5 center anime-fade-in-up"><?php echo $home_ticket; ?></div><?php endif; ?>
