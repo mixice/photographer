@@ -81,8 +81,8 @@ menu-cont li a.active::after {width: 100%;}
 .standpoint ul {display: grid;grid-template-columns: repeat(2, 1fr);grid-gap: 30px;}
 .standpoint li {position: relative;}
 .standpoint li a {padding-bottom: 30px;display: flex;}
-.standpoint li a em {width: 300px;height: 300px;display: block;}
-.standpoint li a aside {flex: 1;padding-left: 30px;display: flex;flex-direction: column;}
+.standpoint li a em {width: 300px;height: 300px;display: block;padding-right: 30px;}
+.standpoint li a aside {flex: 1;display: flex;flex-direction: column;}
 .standpoint li a aside h5 {line-height: 40px;white-space: nowrap;overflow: overflow;text-overflow: ellipsis;font-size: 20px;margin-bottom: 10px;}
 .standpoint li a aside p {line-height: 25px;height: 150px;overflow: hidden;display: block;margin-bottom: 70px;font-size: 16px;}
 
@@ -143,6 +143,15 @@ page a.ico:hover {color: var(--color);}
 [pop=pop] pop-main {max-width: 300px;}
 [pop=pop] pop-cont {padding: 0;}
 
+/* article */
+article {font-size: 16px;}
+article h1 {font-size: 26px;}
+article h2 {font-size: 24px;}
+article h3 {font-size: 22px;}
+article h4 {font-size: 20px;}
+article h5 {font-size: 18px;}
+article h6 {font-size: 16px;}
+
 
 
 
@@ -191,8 +200,8 @@ page a.ico:hover {color: var(--color);}
     .standpoint .ticket {padding: 1rem 0;}
     .standpoint ul {grid-template-columns: repeat(1, 1fr);grid-gap: .2rem;}
     .standpoint li a {padding-bottom: .2rem;display: block;}
-    .standpoint li a em {width: 100%;height: 4rem;display: block;margin-bottom: .1rem;}
-    .standpoint li a aside {padding: 0;display: block;}
+    .standpoint li a em {width: 100%;height: 4rem;display: block;margin-bottom: .1rem;padding: 0;}
+    .standpoint li a aside {display: block;}
     .standpoint li a aside h5 {line-height: .6rem;font-size: .22rem;margin: 0;}
     .standpoint li a aside p {line-height: 180%;height: auto;overflow: inherit;margin-bottom: .2rem;font-size: .18rem;}
 
@@ -233,6 +242,15 @@ page a.ico:hover {color: var(--color);}
 
     /* pop */
     [pop=pop] pop-main {max-width: 3.5;}
+
+    /* article */
+    article {font-size: .18rem;}
+    article h1 {font-size: .3rem;}
+    article h2 {font-size: .26rem;}
+    article h3 {font-size: .24rem;}
+    article h4 {font-size: .22rem;}
+    article h5 {font-size: .2rem;}
+    article h6 {font-size: .18rem;}
 
 }
 

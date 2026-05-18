@@ -14,7 +14,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $content = $_POST['content'] ?? '';
     $comment_enabled = !empty($_POST['comment_enabled']) ? 1 : 0;
     $date_input = trim($_POST['created_at'] ?? '');
-    $created_at = $date_input ? $date_input . ' ' . date('H:i:s') : date('Y-m-d H:i:s');
+    if ($date_input) {
+        // 编辑时保留原时分秒，新增时用当前时间
+        if ($id && $row && $row['created_at']) {
+            $time_part = substr($row['created_at'], 11, 8);
+            $created_at = $date_input . ' ' . ($time_part ?: date('H:i:s'));
+        } else {
+            $created_at = $date_input . ' ' . date('H:i:s');
+        }
+    } else {
+        $created_at = $id && $row && $row['created_at'] ? $row['created_at'] : date('Y-m-d H:i:s');
+    }
     $cover = $row['cover'] ?? '';
 
     // handle cover upload
@@ -31,8 +41,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif ($id) {
         $content = moveTmpFiles($content, 'standpoint');
         cleanUnusedFiles($row['cover'] ?? '', $cover, $row['content'] ?? '', $content);
-        $stmt = $conn->prepare("UPDATE standpoint SET title=?, cover=?, content=?, comment_enabled=? WHERE id=?");
-        $stmt->bind_param("sssii", $title, $cover, $content, $comment_enabled, $id);
+        $stmt = $conn->prepare("UPDATE standpoint SET title=?, cover=?, content=?, comment_enabled=?, created_at=? WHERE id=?");
+        $stmt->bind_param("sssisi", $title, $cover, $content, $comment_enabled, $created_at, $id);
         if ($stmt->execute()) {
             header("Location: standpoint-add.php?id=$id&msg=saved");
             exit();
