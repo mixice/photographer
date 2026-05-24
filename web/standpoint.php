@@ -1,17 +1,15 @@
 <?php
 include ('head.php');
 
-// settings
-$settings = $conn->query("SELECT * FROM settings LIMIT 1")->fetch_assoc();
+$settings = getSettings($conn);
 $standpoint_ticket = $settings['standpoint_ticket'] ?? '';
 
-// list
 $page_size = 10;
 $current_page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
 $total = $conn->query("SELECT COUNT(*) FROM standpoint")->fetch_row()[0];
 $total_pages = max(1, ceil($total / $page_size));
 $offset = ($current_page - 1) * $page_size;
-$list = $conn->query("SELECT * FROM standpoint ORDER BY created_at DESC LIMIT $offset, $page_size");
+$list = $conn->query("SELECT id, title, cover, content, created_at FROM standpoint ORDER BY created_at DESC LIMIT $offset, $page_size");
 ?>
 
 <section class="standpoint">

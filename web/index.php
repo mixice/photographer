@@ -1,17 +1,16 @@
 <?php
 include ('head.php');
 
-// settings
-$settings = $conn->query("SELECT * FROM settings LIMIT 1")->fetch_assoc();
+$settings = getSettings($conn);
 $home_ticket = $settings['home_ticket'] ?? '';
 $site_description = $settings['description'] ?? '';
 $photography_ticket = $settings['photography_ticket'] ?? '';
 $standpoint_ticket = $settings['standpoint_ticket'] ?? '';
 $comment_ticket = $settings['comment_ticket'] ?? '';
 
-$photos = $conn->query("SELECT * FROM photography ORDER BY created_at DESC LIMIT 30");
-$articles = $conn->query("SELECT * FROM standpoint ORDER BY created_at DESC LIMIT 2");
-$comments = $conn->query("SELECT * FROM comment WHERE status=1 ORDER BY created_at DESC LIMIT 5");
+$photos = $conn->query("SELECT id, title, cover, created_at FROM photography ORDER BY created_at DESC LIMIT 30");
+$articles = $conn->query("SELECT id, title, cover, content, created_at FROM standpoint ORDER BY created_at DESC LIMIT 2");
+$comments = $conn->query("SELECT id, name, content, created_at FROM comment WHERE status=1 ORDER BY created_at DESC LIMIT 5");
 ?>
 
 <section class="light">
@@ -22,7 +21,7 @@ $comments = $conn->query("SELECT * FROM comment WHERE status=1 ORDER BY created_
     </section>
     <?php if ($home_ticket): ?><div class="ticket absolute-5 center anime-fade-in-up"><?php echo $home_ticket; ?></div><?php endif; ?>
     <div class="light-logo absolute-2 anime-fade-in-down"><i class="ico ico-m"></i></div>
-    <div class="light-txt absolute-7 anime-fade-in-up"><h3><?php echo $site_title; ?><br>photographer</h3><span><?php echo htmlspecialchars($site_description) ?: 'Freeze the important moments in life'; ?></span></div>
+    <div class="light-txt absolute-7 anime-fade-in-up"><h3><?php echo $site_title; ?><br>photographer</h3><span><?php echo $site_description ?: 'Freeze the important moments in life'; ?></span></div>
     <div class="light-sns absolute-9 center anime-fade-in">
         <a pop="pop" class="ico ico-douyin"></a>
         <a pop="pop" class="ico ico-wechat"></a>

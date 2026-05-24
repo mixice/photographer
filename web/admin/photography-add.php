@@ -2,10 +2,6 @@
 include ('head.php');
 
 $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
-$col = $conn->query("SHOW COLUMNS FROM photography LIKE 'images'");
-if ($col && $col->num_rows === 0) {
-    $conn->query("ALTER TABLE photography ADD COLUMN images LONGTEXT COMMENT '相册图片JSON' AFTER cover");
-}
 $row = $id ? $conn->query("SELECT * FROM photography WHERE id = $id")->fetch_assoc() : null;
 
 $upload_dir = '/uploads/photography/';
@@ -16,6 +12,7 @@ function uploadPhotographyImage($file, $upload_path, $upload_dir) {
     if (empty($file) || $file['error'] !== UPLOAD_ERR_OK) return '';
     $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
     if (!in_array($ext, ['jpg', 'jpeg', 'png', 'webp', 'gif'])) return '';
+    if (!isValidImageFile($file['tmp_name'])) return '';
     $filename = date('YmdHis') . mt_rand(1000, 9999) . '.' . $ext;
     if (move_uploaded_file($file['tmp_name'], $upload_path . $filename)) {
         return $upload_dir . $filename;

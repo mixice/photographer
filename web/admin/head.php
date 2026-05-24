@@ -14,9 +14,9 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     exit();
 }
 
-$settings = $conn->query("SELECT * FROM settings LIMIT 1")->fetch_assoc();
-$admin_name = $settings ? $settings['account'] : 'admin';
-$site_title = $settings ? $settings['title'] : 'Admin';
+$settings = getSettings($conn);
+$admin_name = $settings['account'] ?? 'admin';
+$site_title = $settings['title'] ?? 'Admin';
 ?>
 
 <!doctype html>

@@ -14,6 +14,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($result->num_rows > 0) {
         $row = $result->fetch_assoc();
         if ($input_account === $row['account'] && password_verify($input_password, $row['password'])) {
+            session_regenerate_id(true);
             $_SESSION['loggedin'] = true;
             $_SESSION['username'] = $row['account'];
             unset($_SESSION['error']);

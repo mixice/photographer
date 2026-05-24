@@ -28,8 +28,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->execute();
     $stmt->close();
 
-    $settings = $conn->query("SELECT * FROM settings LIMIT 1")->fetch_assoc();
+    $settings = getSettings($conn, true);
     $saved = true;
+} elseif (!isset($settings)) {
+    $settings = getSettings($conn);
 }
 ?>
 

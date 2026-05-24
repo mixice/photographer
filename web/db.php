@@ -15,7 +15,52 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-$conn->set_charset("utf8");
+$conn->set_charset("utf8mb4");
+
+// ---------------------------------------------------------------------------------------------settings
+function getSettings($conn, $refresh = false) {
+    static $settings = null;
+    if ($refresh) {
+        $settings = null;
+    }
+    if ($settings === null) {
+        $result = $conn->query("SELECT * FROM settings LIMIT 1");
+        $settings = $result ? ($result->fetch_assoc() ?: []) : [];
+    }
+    return $settings;
+}
+
+// ---------------------------------------------------------------------------------------------csrf
+function csrfToken() {
+    if (empty($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
+    return $_SESSION['csrf_token'];
+}
+
+function validateCsrf($token) {
+    return isset($_SESSION['csrf_token']) && is_string($token) && hash_equals($_SESSION['csrf_token'], $token);
+}
+
+// ---------------------------------------------------------------------------------------------count
+function countWhere($conn, $table, $where, $types = '', $params = []) {
+    $sql = "SELECT COUNT(*) FROM `$table` WHERE $where";
+    if ($types === '') {
+        return (int) $conn->query($sql)->fetch_row()[0];
+    }
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param($types, ...$params);
+    $stmt->execute();
+    return (int) $stmt->get_result()->fetch_row()[0];
+}
+
+function isValidImageFile($path) {
+    $info = @getimagesize($path);
+    if ($info === false) {
+        return false;
+    }
+    return in_array($info[2], [IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_GIF, IMAGETYPE_WEBP], true);
+}
 
 // ---------------------------------------------------------------------------------------------page
 function renderPagination($current_page, $total_pages, $params = []) {
@@ -73,13 +118,13 @@ function renderPagination($current_page, $total_pages, $params = []) {
 }
 
 // ---------------------------------------------------------------------------------------------- del
-function deleteRecordWithFiles($table, $id, $image_fields = [], $content_fields = []) {
+function deleteRecordWithFiles($table, $id, $image_fields = [], $content_fields = [], $json_image_fields = []) {
     global $conn;
     if (empty($table) || $id <= 0) {
         return [false, 'Parameter error'];
     }
     try {
-        $fields_to_select = array_merge($image_fields, $content_fields);
+        $fields_to_select = array_merge($image_fields, $content_fields, $json_image_fields);
         if (empty($fields_to_select)) {
             $delete_sql = "DELETE FROM `$table` WHERE id = ?";
             $stmt = $conn->prepare($delete_sql);
@@ -113,6 +158,11 @@ function deleteRecordWithFiles($table, $id, $image_fields = [], $content_fields 
                     $file = $_SERVER['DOCUMENT_ROOT'] . $url;
                     if (file_exists($file)) unlink($file);
                 }
+            }
+        }
+        foreach ($json_image_fields as $field) {
+            if (!empty($data[$field])) {
+                deleteFilesByUrls(extractImageUrlsFromJson($data[$field]));
             }
         }
         $delete_sql = "DELETE FROM `$table` WHERE id = ?";

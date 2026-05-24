@@ -6,9 +6,12 @@ $current_page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
 $keyword = isset($_GET['keyword']) ? trim($_GET['keyword']) : '';
 
 // delete
-if (isset($_GET['action']) && $_GET['action'] === 'delete') {
-    $id = intval($_GET['id']);
-    $result = deleteRecordWithFiles('page', $id, [], ['content']);
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'delete') {
+    if (!validateCsrf($_POST['csrf_token'] ?? '')) {
+        die('Invalid request');
+    }
+    $id = intval($_POST['id']);
+    deleteRecordWithFiles('page', $id, [], ['content']);
     $conn->query("DELETE FROM comment WHERE target_type='page' AND target_id=$id");
     header("Location: page.php?page=1");
     exit();
@@ -17,24 +20,28 @@ if (isset($_GET['action']) && $_GET['action'] === 'delete') {
 // query
 $where = "1=1";
 $params = [];
+$count_types = '';
 if (!empty($keyword)) {
     $where .= " AND (title LIKE ? OR slug LIKE ?)";
     $params[] = "%$keyword%";
     $params[] = "%$keyword%";
+    $count_types = 'ss';
 }
 
-$total = $conn->query("SELECT COUNT(*) FROM page WHERE $where")->fetch_row()[0];
+$total = countWhere($conn, 'page', $where, $count_types, $params);
 $total_pages = max(1, ceil($total / $page_size));
 $offset = ($current_page - 1) * $page_size;
+$list_sql = "SELECT id, title, slug, created_at FROM page WHERE $where ORDER BY created_at DESC LIMIT $offset, $page_size";
 
 if (!empty($params)) {
-    $stmt = $conn->prepare("SELECT * FROM page WHERE $where ORDER BY created_at DESC LIMIT $offset, $page_size");
+    $stmt = $conn->prepare($list_sql);
     $stmt->bind_param("ss", ...$params);
     $stmt->execute();
     $list = $stmt->get_result();
 } else {
-    $list = $conn->query("SELECT * FROM page WHERE $where ORDER BY created_at DESC LIMIT $offset, $page_size");
+    $list = $conn->query($list_sql);
 }
+$csrf = csrfToken();
 ?>
 
 <div class="title"><h4>page</h4></div>
@@ -63,7 +70,7 @@ if (!empty($params)) {
                             <td><?php echo substr($row['created_at'], 0, 10); ?></td>
                             <td><a class="ico ico-link" href="/page.php?slug=<?=htmlspecialchars($row['slug'])?>" target="_blank"></a>
                                 <a class="ico ico-edit co-green" href="page-add.php?id=<?php echo $row['id']; ?>"></a>
-                                <button class="ico ico-delete co-red" onclick="del(<?=$row['id']?>)"></button>
+                                <button type="button" class="ico ico-delete co-red" onclick="del(<?=$row['id']?>)"></button>
                             </td>
                         </tr>
                         <?php endwhile; ?>
@@ -77,7 +84,12 @@ if (!empty($params)) {
     </div>
 </div>
 
-<script>function del(id){confirm('Delete will remove related files and comments, confirm ?').then(function(r){if(r)location.href='page.php?action=delete&id='+id})}</script>
+<form id="del-form" method="POST" style="display:none">
+    <input type="hidden" name="action" value="delete">
+    <input type="hidden" name="id" id="del-id">
+    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf, ENT_QUOTES, 'UTF-8'); ?>">
+</form>
+<script>function del(id){confirm('Delete will remove related files and comments, confirm ?').then(function(r){if(r){document.getElementById('del-id').value=id;document.getElementById('del-form').submit()}})}</script>
 
 </section>
 </section>

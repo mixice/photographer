@@ -5,8 +5,8 @@ date_default_timezone_set('PRC');
 header("Content-type: text/html; charset=utf-8");
 error_reporting(0);
 
-$settings = $conn->query("SELECT title FROM settings LIMIT 1")->fetch_assoc();
-$site_title = $settings ? htmlspecialchars($settings['title']) : 'MIXICE';
+$settings = getSettings($conn);
+$site_title = htmlspecialchars($settings['title'] ?? 'MIXICE', ENT_QUOTES, 'UTF-8');
 $script = basename($_SERVER['SCRIPT_NAME']);
 $slug = $_GET['slug'] ?? '';
 ?>
@@ -43,7 +43,7 @@ $slug = $_GET['slug'] ?? '';
             <li><a class="line<?php echo $script === 'index.php' ? ' active' : ''; ?>" href="index.php">home</a></li>
             <li><a class="line<?php echo in_array($script, ['photography.php', 'album.php']) ? ' active' : ''; ?>" href="photography.php">photography</a></li>
             <li><a class="line<?php echo $script === 'standpoint.php' ? ' active' : ''; ?>" href="standpoint.php">standpoint</a></li>
-            <?php $pages = $conn->query("SELECT * FROM page ORDER BY id ASC"); ?>
+            <?php $pages = $conn->query("SELECT id, title, slug FROM page ORDER BY id ASC"); ?>
             <?php while ($p = $pages->fetch_assoc()): ?>
             <li><a class="line<?php echo ($script === 'page.php' && $slug === $p['slug']) ? ' active' : ''; ?>" href="page.php?slug=<?php echo htmlspecialchars($p['slug']); ?>"><?php echo htmlspecialchars($p['title']); ?></a></li>
             <?php endwhile; ?>

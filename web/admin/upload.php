@@ -3,6 +3,12 @@ require_once('../db.php');
 
 header('Content-Type: application/json');
 
+if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+    http_response_code(401);
+    echo json_encode(['error' => 'Unauthorized']);
+    exit;
+}
+
 // detect type from referer
 $upload_dir = 'uploads/tmp/';
 
@@ -30,6 +36,11 @@ if ($file['size'] > $max_file_size) {
 
 $upload_path = $_SERVER['DOCUMENT_ROOT'] . '/' . $upload_dir;
 if (!is_dir($upload_path)) mkdir($upload_path, 0755, true);
+
+if (!isValidImageFile($file['tmp_name'])) {
+    echo json_encode(['error' => 'Invalid image file']);
+    exit;
+}
 
 $filename = date('YmdHis') . rand(100, 999) . '.' . $file_extension;
 $filepath = $upload_path . $filename;

@@ -3,7 +3,9 @@ require_once('../db.php');
 
 $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
-// slug check (before head.php, no HTML output)
+include ('head.php');
+
+// slug check (after auth)
 if (isset($_GET['check']) && $_GET['check']) {
     header('Content-Type: application/json');
     $slug = preg_replace('/[^a-z0-9\-]/', '', strtolower(trim($_GET['check'])));
@@ -13,14 +15,15 @@ if (isset($_GET['check']) && $_GET['check']) {
     $q->execute();
     $exists = $q->get_result()->num_rows > 0;
     if ($exists && $id) {
-        $row = $conn->query("SELECT slug FROM page WHERE id = $id")->fetch_assoc();
+        $slug_stmt = $conn->prepare("SELECT slug FROM page WHERE id = ?");
+        $slug_stmt->bind_param('i', $id);
+        $slug_stmt->execute();
+        $row = $slug_stmt->get_result()->fetch_assoc();
         if ($row && $row['slug'] === $slug) $exists = false;
     }
     echo json_encode(['ok' => !$exists]);
     exit;
 }
-
-include ('head.php');
 
 $row = $id ? $conn->query("SELECT * FROM page WHERE id = $id")->fetch_assoc() : null;
 

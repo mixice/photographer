@@ -1,17 +1,15 @@
 <?php
 include ('head.php');
 
-// settings
-$settings = $conn->query("SELECT * FROM settings LIMIT 1")->fetch_assoc();
+$settings = getSettings($conn);
 $photography_ticket = $settings['photography_ticket'] ?? '';
 
-// list
 $page_size = 30;
 $current_page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
 $total = $conn->query("SELECT COUNT(*) FROM photography")->fetch_row()[0];
 $total_pages = max(1, ceil($total / $page_size));
 $offset = ($current_page - 1) * $page_size;
-$list = $conn->query("SELECT * FROM photography ORDER BY created_at DESC LIMIT $offset, $page_size");
+$list = $conn->query("SELECT id, title, cover, created_at FROM photography ORDER BY created_at DESC LIMIT $offset, $page_size");
 ?>
 
 <section class="photography">

@@ -6,8 +6,11 @@ $current_page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
 $keyword = isset($_GET['keyword']) ? trim($_GET['keyword']) : '';
 
 // delete
-if (isset($_GET['action']) && $_GET['action'] === 'delete') {
-    $id = intval($_GET['id']);
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'delete') {
+    if (!validateCsrf($_POST['csrf_token'] ?? '')) {
+        die('Invalid request');
+    }
+    $id = intval($_POST['id']);
     $conn->query("DELETE FROM comment WHERE id = $id");
     header("Location: comment.php?page=1");
     exit();
@@ -24,23 +27,26 @@ if (isset($_GET['action']) && $_GET['action'] === 'toggle') {
 // query
 $where = "1=1";
 $params = [];
+$count_types = '';
 if (!empty($keyword)) {
     $where .= " AND (name LIKE ? OR content LIKE ?)";
     $params[] = "%$keyword%";
     $params[] = "%$keyword%";
+    $count_types = 'ss';
 }
 
-$total = $conn->query("SELECT COUNT(*) FROM comment WHERE $where")->fetch_row()[0];
+$total = countWhere($conn, 'comment', $where, $count_types, $params);
 $total_pages = max(1, ceil($total / $page_size));
 $offset = ($current_page - 1) * $page_size;
+$list_sql = "SELECT id, name, email, content, target_type, target_id, status, created_at FROM comment WHERE $where ORDER BY created_at DESC LIMIT $offset, $page_size";
 
 if (!empty($params)) {
-    $stmt = $conn->prepare("SELECT * FROM comment WHERE $where ORDER BY created_at DESC LIMIT $offset, $page_size");
+    $stmt = $conn->prepare($list_sql);
     $stmt->bind_param("ss", ...$params);
     $stmt->execute();
     $list = $stmt->get_result();
 } else {
-    $list = $conn->query("SELECT * FROM comment WHERE $where ORDER BY created_at DESC LIMIT $offset, $page_size");
+    $list = $conn->query($list_sql);
 }
 
 // preload page slugs for link generation
@@ -59,6 +65,7 @@ if ($list->num_rows > 0) {
     }
 }
 $list = $rows;
+$csrf = csrfToken();
 ?>
 
 <div class="title"><h4>comment</h4></div>
@@ -96,7 +103,7 @@ $list = $rows;
                             <td><?php echo substr($row['created_at'], 0, 10); ?></td>
                             <td><o class="toggle<?php echo $row['status'] ? ' active' : ''; ?>" onclick="location.href='comment.php?action=toggle&id=<?php echo $row['id']; ?>&page=<?php echo $current_page; ?>'"></o></td>
                             <td><a class="ico ico-link" href="<?php echo $link; ?>" target="_blank"></a>
-                                <button class="ico ico-delete co-red" onclick="del(<?=$row['id']?>)"></button>
+                                <button type="button" class="ico ico-delete co-red" onclick="del(<?=$row['id']?>)"></button>
                             </td>
                         </tr>
                         <?php endforeach; ?>
@@ -110,7 +117,12 @@ $list = $rows;
     </div>
 </div>
 
-<script>function del(id){confirm('Confirm delete ?').then(function(r){if(r)location.href='comment.php?action=delete&id='+id})}</script>
+<form id="del-form" method="POST" style="display:none">
+    <input type="hidden" name="action" value="delete">
+    <input type="hidden" name="id" id="del-id">
+    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf, ENT_QUOTES, 'UTF-8'); ?>">
+</form>
+<script>function del(id){confirm('Confirm delete ?').then(function(r){if(r){document.getElementById('del-id').value=id;document.getElementById('del-form').submit()}})}</script>
 
 </section>
 </section>
