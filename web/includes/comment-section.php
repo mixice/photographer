@@ -7,10 +7,11 @@
             <li><input type="email" name="email" placeholder="email"></li>
             <li hide><input type="email" name="email-repeat" hide></li>
             <li><textarea name="content" placeholder="comment" required></textarea></li>
+            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(csrfToken(), ENT_QUOTES, 'UTF-8'); ?>">
             <li><button class="btn" type="submit">send</button></li>
         </form>
     </div>
-    <?php if ($comment_ticket): ?><div class="ticket"><?php echo $comment_ticket; ?></div><?php endif; ?>
+    <?php if ($comment_ticket): ?><div class="ticket"><?php echo sanitizeHtml($comment_ticket); ?></div><?php endif; ?>
     <ul>
         <?php if ($comment_list->num_rows > 0): ?>
             <?php while ($c = $comment_list->fetch_assoc()): ?>
@@ -31,9 +32,17 @@
 </section>
 <?php endif; ?>
 
-<?php if (!empty($comment_msg) && $comment_msg === 'commented'): ?>
+<?php if (!empty($comment_msg)): ?>
 <script>
-    alert('Comment submitted !')
-    history.replaceState(null,'',location.pathname+location.search.replace(/&?msg=\w+/,''))
+    var msgs = {
+        'commented': 'Comment submitted !',
+        'csrf_fail': 'Invalid request, please refresh and retry',
+        'rate_limited': 'Please wait a moment before commenting again'
+    };
+    var msgKey = <?php echo json_encode($comment_msg, JSON_UNESCAPED_SLASHES); ?>;
+    if (msgs[msgKey]) {
+        alert(msgs[msgKey])
+        history.replaceState(null,'',location.pathname+location.search.replace(/&?msg=\w+/,''))
+    }
 </script>
 <?php endif; ?>

@@ -18,7 +18,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['loggedin'] = true;
             $_SESSION['username'] = $row['account'];
             unset($_SESSION['error']);
-            echo "<script>location.href='index.php'</script>";
+            header("Location: index.php");
             exit();
         } else {
             $_SESSION['error'] = 1;

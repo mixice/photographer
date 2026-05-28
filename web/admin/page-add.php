@@ -25,7 +25,14 @@ if (isset($_GET['check']) && $_GET['check']) {
     exit;
 }
 
-$row = $id ? $conn->query("SELECT * FROM page WHERE id = $id")->fetch_assoc() : null;
+$row = null;
+if ($id) {
+    $row_stmt = $conn->prepare("SELECT * FROM page WHERE id = ?");
+    $row_stmt->bind_param('i', $id);
+    $row_stmt->execute();
+    $row = $row_stmt->get_result()->fetch_assoc();
+    $row_stmt->close();
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = trim($_POST['title'] ?? '');

@@ -10,13 +10,13 @@ if (isset($_GET['action']) && $_GET['action'] == 'logout') {
 }
 
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
-    echo "<script>location.href='login.php'</script>";
+    header("Location: login.php");
     exit();
 }
 
 $settings = getSettings($conn);
 $admin_name = $settings['account'] ?? 'admin';
-$site_title = $settings['title'] ?? 'Admin';
+$site_title = htmlspecialchars($settings['title'] ?? 'Admin', ENT_QUOTES, 'UTF-8');
 ?>
 
 <!doctype html>

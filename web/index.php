@@ -19,9 +19,9 @@ $comments = $conn->query("SELECT id, name, content, created_at FROM comment WHER
         <?php $selected = array_rand(range(0, 20), 3);foreach($selected as $n) {echo '<div class="swiper-slide"><img src="images/light/' . $n . '.jpg" cover loading="lazy"></div>';}?>
         </div>
     </section>
-    <?php if ($home_ticket): ?><div class="ticket absolute-5 center anime-fade-in-up"><?php echo $home_ticket; ?></div><?php endif; ?>
+    <?php if ($home_ticket): ?><div class="ticket absolute-5 center anime-fade-in-up"><?php echo sanitizeHtml($home_ticket); ?></div><?php endif; ?>
     <div class="light-logo absolute-2 anime-fade-in-down"><i class="ico ico-m"></i></div>
-    <div class="light-txt absolute-7 anime-fade-in-up"><h3><?php echo $site_title; ?><br>photographer</h3><span><?php echo $site_description ?: 'Freeze the important moments in life'; ?></span></div>
+    <div class="light-txt absolute-7 anime-fade-in-up"><h3><?php echo $site_title; ?><br>photographer</h3><span><?php echo htmlspecialchars($site_description) ?: 'Freeze the important moments in life'; ?></span></div>
     <div class="light-sns absolute-9 center anime-fade-in">
         <a pop="pop" class="ico ico-douyin"></a>
         <a pop="pop" class="ico ico-wechat"></a>
@@ -30,7 +30,7 @@ $comments = $conn->query("SELECT id, name, content, created_at FROM comment WHER
     <a class="light-next absolute-8"><i class="ico ico-alone-bottom anime-fade-in-down infinite"></i></a>
 </section>
 <section class="photography restriction">
-    <?php if ($photography_ticket): ?><div class="ticket"><?php echo $photography_ticket; ?></div><?php endif; ?>
+    <?php if ($photography_ticket): ?><div class="ticket"><?php echo sanitizeHtml($photography_ticket); ?></div><?php endif; ?>
     <div class="title"><a class="line" href="photography.php"><h3>new photography</h3></a></div>
     <ul>
         <?php if ($photos->num_rows > 0): ?>
@@ -58,7 +58,7 @@ $comments = $conn->query("SELECT id, name, content, created_at FROM comment WHER
     </ul>
 </section>
 <section class="comment">
-    <?php if ($comment_ticket): ?><div class="ticket"><?php echo $comment_ticket; ?></div><?php endif; ?>
+    <?php if ($comment_ticket): ?><div class="ticket"><?php echo sanitizeHtml($comment_ticket); ?></div><?php endif; ?>
     <div class="title"><h3>new comment</h3></div>
     <ul>
         <?php if ($comments->num_rows > 0): ?>

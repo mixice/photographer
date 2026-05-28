@@ -21,7 +21,7 @@ $settings = getSettings($conn);
 $comment_ticket = $settings['comment_ticket'] ?? '';
 $comment_enabled = $row['comment_enabled'];
 
-handleCommentSubmission($conn, 'page', $row['id'], $comment_enabled, "page.php?slug=" . urlencode($slug) . "&msg=commented");
+handleCommentSubmission($conn, 'page', $row['id'], $comment_enabled, "page.php?slug=" . urlencode($slug) . "&msg=commented", "page.php?slug=" . urlencode($slug));
 
 $comment_msg = $_GET['msg'] ?? '';
 extract(getCommentPagination($conn, 'page', $row['id']));
@@ -32,7 +32,7 @@ $comment_pagination_base = "?slug=" . urlencode($slug);
 <section class="article">
     <div class="article-title"><h3><?php echo htmlspecialchars($row['title']); ?></h3></div>
     <div class="article-cont">
-        <article><?php echo $row['content']; ?></article>
+        <article><?php echo sanitizeHtml($row['content']); ?></article>
     </div>
 </section>
 

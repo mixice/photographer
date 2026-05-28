@@ -9,11 +9,14 @@ $current_page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
 $total = $conn->query("SELECT COUNT(*) FROM standpoint")->fetch_row()[0];
 $total_pages = max(1, ceil($total / $page_size));
 $offset = ($current_page - 1) * $page_size;
-$list = $conn->query("SELECT id, title, cover, content, created_at FROM standpoint ORDER BY created_at DESC LIMIT $offset, $page_size");
+$list_stmt = $conn->prepare("SELECT id, title, cover, content, created_at FROM standpoint ORDER BY created_at DESC LIMIT ?, ?");
+$list_stmt->bind_param('ii', $offset, $page_size);
+$list_stmt->execute();
+$list = $list_stmt->get_result();
 ?>
 
 <section class="standpoint">
-    <?php if ($standpoint_ticket): ?><div class="ticket"><?php echo $standpoint_ticket; ?></div><?php endif; ?>
+    <?php if ($standpoint_ticket): ?><div class="ticket"><?php echo sanitizeHtml($standpoint_ticket); ?></div><?php endif; ?>
     <div class="title"><h3>standpoint</h3></div>
     <ul>
         <?php if ($list->num_rows > 0): ?>

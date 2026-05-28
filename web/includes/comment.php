@@ -1,8 +1,20 @@
 <?php
 
-function handleCommentSubmission($conn, $target_type, $target_id, $comment_enabled, $redirect_url) {
+function handleCommentSubmission($conn, $target_type, $target_id, $comment_enabled, $redirect_url, $error_redirect) {
     if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !$comment_enabled) {
         return false;
+    }
+
+    // CSRF token validation
+    if (!validateCsrf($_POST['csrf_token'] ?? '')) {
+        header("Location: " . $error_redirect . (strpos($error_redirect, '?') !== false ? '&' : '?') . "msg=csrf_fail");
+        exit();
+    }
+
+    // Rate limiting: 1 comment per 60 seconds per session
+    if (isset($_SESSION['last_comment_time']) && (time() - $_SESSION['last_comment_time']) < 60) {
+        header("Location: " . $error_redirect . (strpos($error_redirect, '?') !== false ? '&' : '?') . "msg=rate_limited");
+        exit();
     }
 
     $name = trim($_POST['name'] ?? '');
@@ -18,6 +30,7 @@ function handleCommentSubmission($conn, $target_type, $target_id, $comment_enabl
         $stmt = $conn->prepare("INSERT INTO comment (target_type, target_id, name, email, content, status) VALUES (?, ?, ?, ?, ?, 0)");
         $stmt->bind_param("sisss", $target_type, $target_id, $name, $email, $content);
         if ($stmt->execute()) {
+            $_SESSION['last_comment_time'] = time();
             header("Location: $redirect_url");
             exit();
         }

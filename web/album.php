@@ -8,14 +8,26 @@ if ($id <= 0) {
     exit();
 }
 
-$row = $conn->query("SELECT id, title, cover, images, comment_enabled, created_at FROM photography WHERE id = $id")->fetch_assoc();
+$row_stmt = $conn->prepare("SELECT id, title, cover, images, comment_enabled, created_at FROM photography WHERE id = ?");
+$row_stmt->bind_param('i', $id);
+$row_stmt->execute();
+$row = $row_stmt->get_result()->fetch_assoc();
+$row_stmt->close();
 if (!$row) {
     header("Location: photography.php");
     exit();
 }
 
-$prev = $conn->query("SELECT id, title FROM photography WHERE id < $id ORDER BY id DESC LIMIT 1")->fetch_assoc();
-$next = $conn->query("SELECT id, title FROM photography WHERE id > $id ORDER BY id ASC LIMIT 1")->fetch_assoc();
+$prev_stmt = $conn->prepare("SELECT id, title FROM photography WHERE id < ? ORDER BY id DESC LIMIT 1");
+$prev_stmt->bind_param('i', $id);
+$prev_stmt->execute();
+$prev = $prev_stmt->get_result()->fetch_assoc();
+$prev_stmt->close();
+$next_stmt = $conn->prepare("SELECT id, title FROM photography WHERE id > ? ORDER BY id ASC LIMIT 1");
+$next_stmt->bind_param('i', $id);
+$next_stmt->execute();
+$next = $next_stmt->get_result()->fetch_assoc();
+$next_stmt->close();
 
 $settings = getSettings($conn);
 $comment_ticket = $settings['comment_ticket'] ?? '';
@@ -23,7 +35,7 @@ $comment_enabled = $row['comment_enabled'];
 $images = extractImageUrlsFromJson($row['images'] ?? '');
 if (empty($images) && !empty($row['cover'])) $images[] = $row['cover'];
 
-handleCommentSubmission($conn, 'photography', $id, $comment_enabled, "album.php?id=$id&msg=commented");
+handleCommentSubmission($conn, 'photography', $id, $comment_enabled, "album.php?id=$id&msg=commented", "album.php?id=$id");
 
 $comment_msg = $_GET['msg'] ?? '';
 extract(getCommentPagination($conn, 'photography', $id));

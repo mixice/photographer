@@ -9,6 +9,36 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     exit;
 }
 
+// CSRF protection: verify Origin / Referer / token
+$csrf_ok = false;
+$server_host = strtolower($_SERVER['SERVER_NAME']);
+
+// 1. Origin header (present on all cross-origin AJAX requests)
+if (!empty($_SERVER['HTTP_ORIGIN'])) {
+    $origin_host = strtolower(parse_url($_SERVER['HTTP_ORIGIN'], PHP_URL_HOST));
+    $csrf_ok = ($origin_host === $server_host);
+}
+
+// 2. Referer header fallback (same-origin AJAX typically sends Referer)
+if (!$csrf_ok && !empty($_SERVER['HTTP_REFERER'])) {
+    $ref_host_full = parse_url($_SERVER['HTTP_REFERER'], PHP_URL_HOST);
+    if ($ref_host_full) {
+        $ref_host = strtolower(explode(':', $ref_host_full)[0]);
+        $csrf_ok = ($ref_host === $server_host);
+    }
+}
+
+// 3. X-CSRF-Token header (for programmatic API access)
+if (!$csrf_ok && !empty($_SERVER['HTTP_X_CSRF_TOKEN'])) {
+    $csrf_ok = validateCsrf($_SERVER['HTTP_X_CSRF_TOKEN']);
+}
+
+if (!$csrf_ok) {
+    http_response_code(403);
+    echo json_encode(['error' => 'Invalid request origin']);
+    exit;
+}
+
 // detect type from referer
 $upload_dir = 'uploads/tmp/';
 

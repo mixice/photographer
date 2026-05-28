@@ -252,4 +252,28 @@ function cleanUnusedFiles($old_cover, $new_cover, $old_content, $new_content) {
         if (file_exists($file)) unlink($file);
     }
 }
+
+// ---------------------------------------------------------------------------------------------sanitize html
+function sanitizeHtml($html) {
+    if (empty($html)) return '';
+
+    // Remove full-block dangerous elements (with content)
+    $html = preg_replace('#<(script|iframe|object|embed|applet|base|link|meta|style)[^>]*>.*?</\1>#is', '', $html);
+    // Remove self-closing / unclosed dangerous elements
+    $html = preg_replace('#<(script|iframe|object|embed|applet|base|link|meta|style)\b[^>]*/?>#is', '', $html);
+
+    // Remove HTML comments (conditional execution in IE)
+    $html = preg_replace('/<!--.*?-->/s', '', $html);
+
+    // Remove on* event handler attributes (onclick, onerror, onload, etc.)
+    $html = preg_replace('#\s+on\w+\s*=\s*(?:"[^"]*"|\'[^\']*\'|[^\s>]*)#i', '', $html);
+
+    // Remove javascript:/vbscript:/data: protocols in href/src/action
+    $html = preg_replace('#\b(href|src|action)\s*=\s*(?:"[^"]*(?:javascript|vbscript|data)\s*:[^"]*"|\'[^\']*(?:javascript|vbscript|data)\s*:[^\']*\')#i', '', $html);
+
+    // Remove CSS expression()
+    $html = preg_replace('#expression\s*\(#i', '', $html);
+
+    return $html;
+}
 ?>

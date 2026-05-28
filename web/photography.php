@@ -9,11 +9,14 @@ $current_page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
 $total = $conn->query("SELECT COUNT(*) FROM photography")->fetch_row()[0];
 $total_pages = max(1, ceil($total / $page_size));
 $offset = ($current_page - 1) * $page_size;
-$list = $conn->query("SELECT id, title, cover, created_at FROM photography ORDER BY created_at DESC LIMIT $offset, $page_size");
+$list_stmt = $conn->prepare("SELECT id, title, cover, created_at FROM photography ORDER BY created_at DESC LIMIT ?, ?");
+$list_stmt->bind_param('ii', $offset, $page_size);
+$list_stmt->execute();
+$list = $list_stmt->get_result();
 ?>
 
 <section class="photography">
-    <?php if ($photography_ticket): ?><div class="ticket"><?php echo $photography_ticket; ?></div><?php endif; ?>
+    <?php if ($photography_ticket): ?><div class="ticket"><?php echo sanitizeHtml($photography_ticket); ?></div><?php endif; ?>
     <div class="title"><h3>photography</h3></div>
     <ul>
         <?php if ($list->num_rows > 0): ?>

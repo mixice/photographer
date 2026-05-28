@@ -11,7 +11,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         die('Invalid request');
     }
     $id = intval($_POST['id']);
-    $conn->query("DELETE FROM comment WHERE id = $id");
+    $del_stmt = $conn->prepare("DELETE FROM comment WHERE id = ?");
+    $del_stmt->bind_param('i', $id);
+    $del_stmt->execute();
+    $del_stmt->close();
     header("Location: comment.php?page=1");
     exit();
 }
@@ -19,7 +22,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 // toggle status
 if (isset($_GET['action']) && $_GET['action'] === 'toggle') {
     $id = intval($_GET['id']);
-    $conn->query("UPDATE comment SET status = IF(status=1, 0, 1) WHERE id = $id");
+    $toggle_stmt = $conn->prepare("UPDATE comment SET status = IF(status=1, 0, 1) WHERE id = ?");
+    $toggle_stmt->bind_param('i', $id);
+    $toggle_stmt->execute();
+    $toggle_stmt->close();
     header("Location: comment.php?page=" . $current_page);
     exit();
 }
@@ -99,10 +105,10 @@ $csrf = csrfToken();
                             <td><?php echo htmlspecialchars($row['name']); ?></td>
                             <td><?php echo htmlspecialchars($row['email'] ?? '-'); ?></td>
                             <td><?php echo htmlspecialchars(mb_substr($row['content'], 0, 50)); ?></td>
-                            <td><?php echo $row['target_type']; ?></td>
+                            <td><?php echo htmlspecialchars($row['target_type']); ?></td>
                             <td><?php echo substr($row['created_at'], 0, 10); ?></td>
                             <td><o class="toggle<?php echo $row['status'] ? ' active' : ''; ?>" onclick="location.href='comment.php?action=toggle&id=<?php echo $row['id']; ?>&page=<?php echo $current_page; ?>'"></o></td>
-                            <td><a class="ico ico-link" href="<?php echo $link; ?>" target="_blank"></a>
+                            <td><a class="ico ico-link" href="<?php echo htmlspecialchars($link, ENT_QUOTES, 'UTF-8'); ?>" target="_blank"></a>
                                 <button type="button" class="ico ico-delete co-red" onclick="del(<?=$row['id']?>)"></button>
                             </td>
                         </tr>

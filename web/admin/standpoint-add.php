@@ -2,7 +2,14 @@
 include ('head.php');
 
 $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
-$row = $id ? $conn->query("SELECT * FROM standpoint WHERE id = $id")->fetch_assoc() : null;
+$row = null;
+if ($id) {
+    $row_stmt = $conn->prepare("SELECT * FROM standpoint WHERE id = ?");
+    $row_stmt->bind_param('i', $id);
+    $row_stmt->execute();
+    $row = $row_stmt->get_result()->fetch_assoc();
+    $row_stmt->close();
+}
 
 // upload dir
 $upload_dir = '/uploads/standpoint/';

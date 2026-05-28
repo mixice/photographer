@@ -12,7 +12,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     }
     $id = intval($_POST['id']);
     deleteRecordWithFiles('page', $id, [], ['content']);
-    $conn->query("DELETE FROM comment WHERE target_type='page' AND target_id=$id");
+    $del_stmt = $conn->prepare("DELETE FROM comment WHERE target_type='page' AND target_id=?");
+    $del_stmt->bind_param('i', $id);
+    $del_stmt->execute();
+    $del_stmt->close();
     header("Location: page.php?page=1");
     exit();
 }
