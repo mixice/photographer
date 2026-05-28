@@ -45,11 +45,11 @@ web/
 The homepage slideshow randomly picks 3 images from `web/images/light/`. Place your banner photos there, named sequentially:
 
 ```
-web/images/light/0.jpg
 web/images/light/1.jpg
 web/images/light/2.jpg
+web/images/light/3.jpg
 ...
-web/images/light/19.jpg
+web/images/light/20.jpg
 ```
 
-Up to 20 images supported (0–19). To change the count, edit the `range(0, 19)` value in `web/index.php`.
+Up to 20 images supported (1–20). To change the count, edit the `range(1, 20)` value in `web/index.php`.
