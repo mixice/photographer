@@ -16,7 +16,7 @@ $comments = $conn->query("SELECT id, name, content, created_at FROM comment WHER
 <section class="light">
     <section class="swiper swiper-banner">
         <div class="swiper-wrapper">
-        <?php $selected = array_rand(range(0, 20), 3);foreach($selected as $n) {echo '<div class="swiper-slide"><img src="images/light/' . $n . '.jpg" cover loading="lazy"></div>';}?>
+        <?php $selected = array_rand(range(0, 19), 3);foreach($selected as $n) {echo '<div class="swiper-slide"><img src="images/light/' . $n . '.jpg" cover loading="lazy"></div>';}?>
         </div>
     </section>
     <?php if ($home_ticket): ?><div class="ticket absolute-5 center anime-fade-in-up"><?php echo sanitizeHtml($home_ticket); ?></div><?php endif; ?>
