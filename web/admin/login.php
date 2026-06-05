@@ -48,7 +48,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <link rel="stylesheet" href="styles/admin.css">
 
 <script src="//ui.gg/lib/jquery.min.js"></script>
-<script src="//ui.gg/lib/uigg.js"></script>
+<script type="module" src="//ui.gg/lib/uigg.js"></script>
 <script src="js/admin.js"></script>
 </head>
 

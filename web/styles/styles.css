@@ -1,4 +1,5 @@
-@import url('//ui.gg/lib/font/font.css');
+@import url('//ui.gg/lib/font/gotham.css');
+@import url('//ui.gg/lib/font/steel.css');
 
 /* basic */
 * {font-family: gotham !important;}
@@ -109,15 +110,6 @@ menu-cont li a.active::after {width: 100%;}
 .foot-sns li a {font-size: 30px;width: 40px;}
 .foot-sns li:hover a {transform: rotateY(180deg);}
 
-/* article */
-.article {max-width: 2000px;margin: 0 auto 100px;padding: 0 30px;}
-.article-title {text-align: center;padding: 50px 0;}
-.article-title h3 {font-size: 36px;margin-bottom: 20px;}
-.article-cont {}
-.article-page {margin: 30px 0 100px;}
-.article-page a {}
-.article-page a h6 {flex: 1;padding: 0 10px;}
-
 /* album */
 .album {column-count: 3;column-gap: 10px;}
 .album li {break-inside: avoid;width: 100%;margin-bottom: 10px;}
@@ -144,6 +136,15 @@ page a.ico:hover {color: var(--color);}
 [pop=pop] pop-cont {padding: 0;}
 
 /* article */
+.article {max-width: 2000px;margin: 0 auto 100px;padding: 0 30px;}
+.article-title {text-align: center;padding: 50px 0;}
+.article-title h3 {font-size: 36px;margin-bottom: 20px;}
+.article-cont {}
+.article-page {margin: 30px 0 100px;}
+.article-page a {width: 50%;}
+.article-page a h6 {flex: 1;padding: 0 10px;font-size: 16px;}
+.article-page a:last-child h6 {text-align: right;}
+
 article {font-size: 16px;}
 article h1 {font-size: 26px;}
 article h2 {font-size: 24px;}
@@ -151,6 +152,16 @@ article h3 {font-size: 22px;}
 article h4 {font-size: 20px;}
 article h5 {font-size: 18px;}
 article h6 {font-size: 16px;}
+article h1,
+article h2,
+article h3,
+article h4,
+article h5 {padding: 20px 0;}
+article h6 {padding: 10px 0;}
+article table th,
+article table td {border-width: 1px;padding: 10px 0;}
+
+article blockquote {padding: 20px;background-color: var(--f7);border-left: 5px var(--ccc) solid;font-style: italic;}
 
 
 
@@ -225,13 +236,6 @@ article h6 {font-size: 16px;}
     .foot-sns li a {font-size: .36rem;width: .5rem;}
     .foot-sns li:hover a {transform: rotateY(0);}
 
-    /* article */
-    .article {padding: 0 .2rem;margin-bottom: 1rem;}
-    .article-title {padding: .5rem 0;}
-    .article-title h3 {font-size: .3rem;margin-bottom: .2rem;}
-    .article-page {margin: .2rem 0 1rem;}
-    .article-page a h6 {padding: 0 .1rem;}
-
     /* album */
     .album {column-count: 2;column-gap: .1rem;}
     .album li {margin-bottom: .1rem;}
@@ -244,6 +248,12 @@ article h6 {font-size: 16px;}
     [pop=pop] pop-main {max-width: 3.5;}
 
     /* article */
+    .article {padding: 0 .2rem;margin-bottom: 1rem;}
+    .article-title {padding: .5rem 0;}
+    .article-title h3 {font-size: .3rem;margin-bottom: .2rem;}
+    .article-page {margin: .2rem 0 1rem;}
+    .article-page a h6 {padding: 0 .1rem;font-size: .18rem;}
+
     article {font-size: .18rem;}
     article h1 {font-size: .3rem;}
     article h2 {font-size: .26rem;}
@@ -251,6 +261,16 @@ article h6 {font-size: 16px;}
     article h4 {font-size: .22rem;}
     article h5 {font-size: .2rem;}
     article h6 {font-size: .18rem;}
+    article h1,
+    article h2,
+    article h3,
+    article h4,
+    article h5 {padding: .2rem 0;}
+    article h6 {padding: .1rem 0;}
+    article table th,
+    article table td {padding: .1rem 0;}
+
+    article blockquote {padding: .2rem;}
 
 }
 

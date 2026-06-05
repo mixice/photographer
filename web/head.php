@@ -29,7 +29,7 @@ $slug = $_GET['slug'] ?? '';
 
 <script src="//ui.gg/lib/jquery.min.js"></script>
 <script src="//ui.gg/lib/swiper-bundle.min.js"></script>
-<script src="//ui.gg/lib/uigg.js"></script>
+<script type="module" src="//ui.gg/lib/uigg.js"></script>
 </head>
 
 <body>
