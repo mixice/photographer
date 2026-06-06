@@ -44,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (empty($title)) {
-        echo "<script>alert('Title is required !')</script>";
+        echo "<script>Uigg.alert('Title is required !')</script>";
     } elseif ($id) {
         $content = moveTmpFiles($content, 'standpoint');
         cleanUnusedFiles($row['cover'] ?? '', $cover, $row['content'] ?? '', $content);
@@ -63,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit();
         }
     }
-    echo "<script>alert('Failed: " . addslashes($conn->error) . " !')</script>";
+    echo "<script>Uigg.alert('Failed: " . addslashes($conn->error) . " !')</script>";
 }
 
 $title_val = htmlspecialchars($row['title'] ?? '', ENT_QUOTES, 'UTF-8');
@@ -106,7 +106,7 @@ if ($msg) $msg_text = $msg === 'added' ? 'Added successfully !' : 'Saved success
 
 <script>
     <?php if ($msg): ?>
-        alert('<?php echo $msg_text; ?>')
+        Uigg.alert('<?php echo $msg_text; ?>')
         history.replaceState(null,'',location.pathname+location.search.replace(/&?msg=\w+/,''))
     <?php endif; ?>
     $(function(){

@@ -104,7 +104,7 @@ function renderPagination($current_page, $total_pages, $params = []) {
                 var url = '?page=' + pageInput + '<?php echo $query_string; ?>';
                 window.location.href = url;
             } else {
-                alert("Please enter a valid page number");
+                Uigg.alert("Please enter a valid page number");
             }
         }
         document.getElementById('pageInput').onkeypress = function(event){

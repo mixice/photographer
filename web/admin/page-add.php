@@ -54,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $slug = preg_replace('/[^a-z0-9\-]/', '', strtolower($slug));
 
     if (empty($title) || empty($slug)) {
-        echo "<script>alert('Title and url are required !')</script>";
+        echo "<script>Uigg.alert('Title and url are required !')</script>";
     } elseif ($id) {
         $content = moveTmpFiles($content, 'page');
         cleanUnusedFiles('', '', $row['content'] ?? '', $content);
@@ -73,7 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit();
         }
     }
-    echo "<script>alert('Failed: " . addslashes($conn->error) . " !')</script>";
+    echo "<script>Uigg.alert('Failed: " . addslashes($conn->error) . " !')</script>";
 }
 
 $title_val = htmlspecialchars($row['title'] ?? '', ENT_QUOTES, 'UTF-8');
@@ -109,7 +109,7 @@ if ($msg) $msg_text = $msg === 'added' ? 'Added successfully !' : 'Saved success
 
 <script>
     <?php if ($msg): ?>
-        alert('<?php echo $msg_text; ?>')
+        Uigg.alert('<?php echo $msg_text; ?>')
         history.replaceState(null,'',location.pathname+location.search.replace(/&?msg=\w+/,''))
     <?php endif; ?>
     $(function(){
@@ -135,7 +135,7 @@ if ($msg) $msg_text = $msg === 'added' ? 'Added successfully !' : 'Saved success
         })
         $('form').on('submit',function(){
             if(!slugOk){
-                alert('This url already exists !')
+                Uigg.alert('This url already exists !')
                 return false
             }
         })

@@ -41,7 +41,7 @@
     };
     var msgKey = <?php echo json_encode($comment_msg, JSON_UNESCAPED_SLASHES); ?>;
     if (msgs[msgKey]) {
-        alert(msgs[msgKey])
+        Uigg.alert(msgs[msgKey])
         history.replaceState(null,'',location.pathname+location.search.replace(/&?msg=\w+/,''))
     }
 </script>

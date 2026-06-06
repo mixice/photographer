@@ -85,7 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $images_json = json_encode($images, JSON_UNESCAPED_SLASHES);
 
     if (empty($title)) {
-        echo "<script>alert('Title is required !')</script>";
+        echo "<script>Uigg.alert('Title is required !')</script>";
     } elseif ($id) {
         $removed = array_diff(array_merge([$row['cover'] ?? ''], $old_images), array_merge([$cover], $images));
         deleteFilesByUrls($removed);
@@ -112,7 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit();
         }
     }
-    echo "<script>alert('Failed: " . addslashes($conn->error) . " !')</script>";
+    echo "<script>Uigg.alert('Failed: " . addslashes($conn->error) . " !')</script>";
 }
 
 $title_val = htmlspecialchars($row['title'] ?? '', ENT_QUOTES, 'UTF-8');
@@ -171,7 +171,7 @@ if ($msg) $msg_text = $msg === 'added' ? 'Added successfully !' : 'Saved success
 <script>
     var message = <?php echo json_encode($msg ? $msg_text : '', JSON_UNESCAPED_SLASHES); ?>;
     if (message) {
-        alert(message)
+        Uigg.alert(message)
         history.replaceState(null,'',location.pathname+location.search.replace(/&?msg=\w+/,''))
     }
     $(function(){

@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <li class="resolve"><button type="submit" class="btn btn-submit">submit</button></li>
             </form>
             <?php if(!empty($saved)): ?>
-            <script>alert('Saved successfully !')</script>
+            <script>Uigg.alert('Saved successfully !')</script>
             <?php endif; ?>
         </section>
     </div>
