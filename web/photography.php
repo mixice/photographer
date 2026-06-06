@@ -7,7 +7,6 @@ $photography_ticket = $settings['photography_ticket'] ?? '';
 $page_size = 30;
 $current_page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
 $total = $conn->query("SELECT COUNT(*) FROM photography")->fetch_row()[0];
-$total_pages = max(1, ceil($total / $page_size));
 $offset = ($current_page - 1) * $page_size;
 $list_stmt = $conn->prepare("SELECT id, title, cover, created_at FROM photography ORDER BY created_at DESC LIMIT ?, ?");
 $list_stmt->bind_param('ii', $offset, $page_size);
@@ -25,10 +24,7 @@ $list = $list_stmt->get_result();
             <?php endwhile; ?>
         <?php endif; ?>
     </ul>
-    <page>
-        <?php if ($current_page > 1): ?><a class="line ico ico-alone-left" href="?page=<?php echo $current_page - 1; ?>"></a><?php endif; ?>
-        <?php if ($current_page < $total_pages): ?><a class="line ico ico-alone-right" href="?page=<?php echo $current_page + 1; ?>"></a><?php endif; ?>
-    </page>
+    <page total="<?php echo $total; ?>" page="<?php echo $current_page; ?>" limit="<?php echo $page_size; ?>" param="page"></page>
 </section>
 
 <?php include ('foot.php') ?>

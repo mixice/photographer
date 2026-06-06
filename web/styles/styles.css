@@ -130,6 +130,10 @@ menu-cont li a.active::after {width: 100%;}
 page {margin-top: 60px;}
 page a.ico {border-radius: 0;margin: 0;background-color: transparent;position: relative;}
 page a.ico:hover {color: var(--color);}
+page > *,
+page > *[disabled] {display: none !important;}
+page > .ico-alone-left,
+page > .ico-alone-right {display: block !important;}
 
 /* pop */
 [pop=pop] pop-main {max-width: 300px;}

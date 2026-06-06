@@ -62,61 +62,6 @@ function isValidImageFile($path) {
     return in_array($info[2], [IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_GIF, IMAGETYPE_WEBP], true);
 }
 
-// ---------------------------------------------------------------------------------------------page
-function renderPagination($current_page, $total_pages, $params = []) {
-    $query_string = '';
-    foreach ($params as $key => $value) {
-        if (!empty($value)) {
-            $query_string .= '&' . urlencode($key) . '=' . urlencode($value);
-        }
-    }
-    ob_start();
-    ?>
-    <page>
-        <?php if ($current_page > 1): ?>
-            <a href="?page=1<?php echo $query_string; ?>" class="ico ico-alone-side-left"></a>
-            <a href="?page=<?php echo $current_page - 1 . $query_string; ?>" class="ico ico-alone-left"></a>
-        <?php endif; ?>
-        <?php
-        $start_page = max(1, $current_page - 2);
-        $end_page = min($total_pages, $current_page + 2);
-        if ($current_page <= 3) {
-            $end_page = min(5, $total_pages);
-        } elseif ($current_page > $total_pages - 3) {
-            $start_page = max(1, $total_pages - 4);
-        }
-        for ($i = $start_page; $i <= $end_page; $i++): ?>
-            <a href="?page=<?php echo $i . $query_string; ?>" class="<?php echo $i == $current_page ? 'active' : ''; ?>"><?php echo $i; ?></a>
-        <?php endfor; ?>
-        <?php if ($current_page < $total_pages): ?>
-            <a href="?page=<?php echo $current_page + 1 . $query_string; ?>" class="ico ico-alone-right"></a>
-            <a href="?page=<?php echo $total_pages . $query_string; ?>" class="ico ico-alone-side-right"></a>
-        <?php endif; ?>
-        <span><?php echo $current_page . '/' . $total_pages; ?></span>
-        <input type="number" min="1" max="<?php echo $total_pages; ?>" id="pageInput">
-        <a class="ico ico-arrow-enter" id="pageJump"></a>
-    </page>
-    <script>
-        function jumpToPage(){
-            var pageInput = document.getElementById('pageInput').value;
-            var totalPages = <?php echo $total_pages; ?>;
-            if(pageInput >= 1 && pageInput <= totalPages){
-                var url = '?page=' + pageInput + '<?php echo $query_string; ?>';
-                window.location.href = url;
-            } else {
-                Uigg.alert("Please enter a valid page number");
-            }
-        }
-        document.getElementById('pageInput').onkeypress = function(event){
-            event = event || window.event;
-            if(event.key === 'Enter' || event.keyCode === 13) jumpToPage();
-        };
-        document.getElementById('pageJump').onclick = jumpToPage;
-    </script>
-    <?php
-    return ob_get_clean();
-}
-
 // ---------------------------------------------------------------------------------------------- del
 function deleteRecordWithFiles($table, $id, $image_fields = [], $content_fields = [], $json_image_fields = []) {
     global $conn;

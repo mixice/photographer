@@ -32,7 +32,6 @@ if (!empty($keyword)) {
 }
 
 $total = countWhere($conn, 'page', $where, $count_types, $params);
-$total_pages = max(1, ceil($total / $page_size));
 $offset = ($current_page - 1) * $page_size;
 $list_sql = "SELECT id, title, slug, created_at FROM page WHERE $where ORDER BY created_at DESC LIMIT $offset, $page_size";
 
@@ -83,7 +82,7 @@ $csrf = csrfToken();
                 </tbody>
             </table>
         </div>
-        <?php echo renderPagination($current_page, $total_pages, ['keyword' => $keyword]); ?>
+        <page total="<?php echo $total; ?>" page="<?php echo $current_page; ?>" limit="<?php echo $page_size; ?>" param="page"></page>
     </div>
 </div>
 
