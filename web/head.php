@@ -27,14 +27,15 @@ $slug = $_GET['slug'] ?? '';
 <link rel="stylesheet" href="//ui.gg/lib/uigg.css">
 <link rel="stylesheet" href="styles/styles.css">
 
-<script src="//ui.gg/lib/jquery.min.js"></script>
 <script src="//ui.gg/lib/swiper-bundle.min.js"></script>
 <script type="module" src="//ui.gg/lib/uigg.js"></script>
+
+<script defer src="//u.mssay.com/script.js" data-website-id="ebe5c624-85c8-429a-b492-03563b176328"></script>
 </head>
 
 <body>
 <load></load>
-<section class="head center anime-fade-in-down">
+<section class="head center anime-fade-in-down" id="head">
     <a href="/" class="logo anime-fade-in"><i class="ico ico-m"></i></a>
     <h1 class="head-cont"><?php echo $site_title; ?> photographer</h1>
     <u></u>

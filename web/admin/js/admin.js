@@ -1,22 +1,34 @@
-//----------------------------------------------------------------------------------function
-$(function(){
-    //----------------------------------------------------------------------------------sider
-    $('.sider-toggle').click(function(){$('.sider').toggle()})
+ready(()=>{
+    const { $ } = Uigg
+    // sider toggle
+    var siderToggle = $('.sider-toggle')
+    if (siderToggle) {
+        siderToggle.addEventListener('click', function(){
+            var sider = $('.sider')
+            if (sider) sider.style.display = sider.style.display === 'none' ? '' : 'none'
+        })
+    }
 
-    let localUrl = window.location.href,
+    var localUrl = window.location.href,
         pageAllName = localUrl.substring(localUrl.lastIndexOf('/') + 1),
-        pageName = pageAllName.substring(0,pageAllName.indexOf('.'))
-    //if(pageName == ''){pageName = ''}
-    $('.sider a[href="'+pageName+'.php"]').parents('fold-group').addClass('active')
+        pageName = pageAllName.substring(0, pageAllName.indexOf('.'))
+    var link = $('.sider a[href="'+pageName+'.php"]')
+    if (link) {
+        var foldGroup = link.closest('fold-group')
+        if (foldGroup) foldGroup.classList.add('active')
+    }
 
-    //----------------------------------------------------------------------------------editor img
-    let t = setInterval(function(){
-        let d = document.querySelector('iframe')?.contentDocument
-        if(d){
-            let s = d.createElement('style')
-            s.textContent = 'img{max-width:100%;height:auto}'
-            d.head.appendChild(s)
-            clearInterval(t)
+    // editor image max-width fix
+    var t = setInterval(function(){
+        var d = $('iframe')
+        if (d) {
+            var dc = d.contentDocument
+            if (dc) {
+                var s = dc.createElement('style')
+                s.textContent = 'img{max-width:100%;height:auto}'
+                dc.head.appendChild(s)
+                clearInterval(t)
+            }
         }
-    },300)
+    }, 300)
 })

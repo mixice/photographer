@@ -107,36 +107,40 @@ if ($msg) $msg_text = $msg === 'added' ? 'Added successfully !' : 'Saved success
     </div>
 </div>
 
-<script>
-    <?php if ($msg): ?>
-        Uigg.alert('<?php echo $msg_text; ?>')
-        history.replaceState(null,'',location.pathname+location.search.replace(/&?msg=\w+/,''))
-    <?php endif; ?>
-    $(function(){
-        let slugOk = true
-        $('o.toggle').click(function(){
-            $('input[name=comment_enabled]').val($(this).hasClass('active') ? 1 : 0)
+<script type="module">
+    const { $, alert } = Uigg
+    ready(() => {
+        <?php if ($msg): ?>
+            alert('<?php echo $msg_text; ?>')
+            history.replaceState(null,'',location.pathname+location.search.replace(/&?msg=\w+/,''))
+        <?php endif; ?>
+        var slugOk = true
+        $('o.toggle').addEventListener('click', function(){
+            $('input[name=comment_enabled]').value = this.classList.contains('active') ? 0 : 1
         })
-        $('input[name=slug]').on('blur',function(){
-            let v = $(this).val().trim()
+        $('input[name=slug]').addEventListener('blur', function(){
+            var v = this.value.trim()
             if(!v) return
-            let tip = $('#slug-tip')
-            tip.hide()
+            var tip = document.getElementById('slug-tip')
+            tip.style.display = 'none'
             slugOk = true
-            $.get('page-add.php?check='+encodeURIComponent(v),function(r){
-                if(!r.ok){
-                    tip.text('This url already exists !').show()
-                    slugOk = false
-                }else{
-                    tip.hide()
-                    slugOk = true
-                }
-            })
+            fetch('page-add.php?check='+encodeURIComponent(v))
+                .then(function(r){ return r.json() })
+                .then(function(r){
+                    if(!r.ok){
+                        tip.textContent = 'This url already exists !'
+                        tip.style.display = ''
+                        slugOk = false
+                    }else{
+                        tip.style.display = 'none'
+                        slugOk = true
+                    }
+                })
         })
-        $('form').on('submit',function(){
+        $('form').addEventListener('submit', function(e){
             if(!slugOk){
-                Uigg.alert('This url already exists !')
-                return false
+                e.preventDefault()
+                alert('This url already exists !')
             }
         })
     })

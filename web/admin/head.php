@@ -35,10 +35,9 @@ $site_title = htmlspecialchars($settings['title'] ?? 'Admin', ENT_QUOTES, 'UTF-8
 <link rel="stylesheet" href="//ui.gg/lib/uigg.css">
 <link rel="stylesheet" href="styles/admin.css">
 
-<script src="//ui.gg/lib/jquery.min.js"></script>
 <script src="//ui.gg/lib/editor/editor.js"></script>
 <script type="module" src="//ui.gg/lib/uigg.js"></script>
-<script src="js/admin.js"></script>
+<script type="module" src="js/admin.js"></script>
 </head>
 
 <body>
@@ -79,7 +78,7 @@ $site_title = htmlspecialchars($settings['title'] ?? 'Admin', ENT_QUOTES, 'UTF-8
                 </fold-group>
                 <fold-group>
                     <fold-title><a href="page.php"><i class="ico ico-document"></i>page</a></fold-title>
-                </fold-group>  
+                </fold-group>
                 <h6>other</h6>
                 <fold-group>
                     <fold-title><a href="comment.php"><i class="ico ico-talk-info"></i>comment</a></fold-title>

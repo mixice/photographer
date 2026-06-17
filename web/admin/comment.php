@@ -127,7 +127,18 @@ $csrf = csrfToken();
     <input type="hidden" name="id" id="del-id">
     <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf, ENT_QUOTES, 'UTF-8'); ?>">
 </form>
-<script>function del(id){Uigg.confirm('Confirm delete ?').then(function(r){if(r){document.getElementById('del-id').value=id;document.getElementById('del-form').submit()}})}</script>
+
+<script type="module">
+    const { $, confirm } = Uigg
+    window.del = id => {
+        confirm('Confirm delete ?').then(r => {
+            if(r){
+                $('#del-id').value = id
+                $('#del-form').submit()
+            }
+        })
+    }
+</script>
 
 </section>
 </section>

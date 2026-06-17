@@ -168,94 +168,109 @@ if ($msg) $msg_text = $msg === 'added' ? 'Added successfully !' : 'Saved success
     </div>
 </div>
 
-<script>
+<script type="module">
+    const { $, $$, alert } = Uigg
     var message = <?php echo json_encode($msg ? $msg_text : '', JSON_UNESCAPED_SLASHES); ?>;
-    if (message) {
-        Uigg.alert(message)
-        history.replaceState(null,'',location.pathname+location.search.replace(/&?msg=\w+/,''))
-    }
-    $(function(){
-        $('o.toggle').click(function(){
-            $('input[name=comment_enabled]').val($(this).hasClass('active') ? 1 : 0)
-        })
-
-        $('.upload').on('click', '.upload-group n', function(e){
-            e.preventDefault()
-            var group = $(this).closest('.upload-group'),
-                newIndex = group.data('newIndex')
-            if (newIndex !== undefined) {
-                selectedPhotos.splice(newIndex, 1)
-                refreshPhotosInput()
-                group.remove()
-                $('.upload-group[data-new-index]').each(function(index){
-                    $(this).attr('data-new-index', index)
-                })
-            } else {
-                group.remove()
-            }
-        })
-
-        $('.upload').on('change', 'input[type=file]:not([multiple])', function(){
-            var input = this,
-                group = $(input).closest('.upload-group'),
-                file = input.files[0]
-            if (group.data('newIndex') !== undefined) return
-            if (!file) return
-            var reader = new FileReader()
-            reader.onload = function(e){
-                group.css({
-                    backgroundImage: 'url("' + e.target.result + '")',
-                    color: 'transparent'
-                })
-            }
-            reader.readAsDataURL(file)
-        })
-
-        var photosInput = $('input[name="photos[]"]')[0],
-            selectedPhotos = []
+    ready(() => {
+        if (message) {
+            alert(message)
+            history.replaceState(null,'',location.pathname+location.search.replace(/&?msg=\w+/,''))
+        }
+        const photosInput = $('input[name="photos[]"]')
+        let selectedPhotos = []
 
         function refreshPhotosInput(){
-            var transfer = new DataTransfer()
-            selectedPhotos.forEach(function(file){ transfer.items.add(file) })
-            photosInput.files = transfer.files
+            const dt = new DataTransfer()
+            selectedPhotos.forEach(f => dt.items.add(f))
+            photosInput.files = dt.files
         }
 
         function renderSelectedPhotos(){
-            $('.upload-group[data-new-index]').remove()
-            selectedPhotos.forEach(function(file, index){
-                var reader = new FileReader()
-                reader.onload = function(e){
-                    $('<div class="ico upload-group" style="color: transparent"><input type="file" accept=".jpg,.jpeg,.png,.webp,.gif"><n class="ico"></n></div>')
-                        .attr('data-new-index', index)
-                        .css({backgroundImage: 'url("' + e.target.result + '")', color: 'transparent'})
-                        .insertBefore($(photosInput).closest('.upload-group'))
+            $$('.upload-group[data-new-index]').forEach(el => el.remove())
+            selectedPhotos.forEach((file, i) => {
+                const reader = new FileReader()
+                reader.onload = e => {
+                    const div = document.createElement('div')
+                    div.className = 'ico upload-group'
+                    div.setAttribute('data-new-index', i)
+                    div.style.backgroundImage = `url("${e.target.result}")`
+                    div.style.color = 'transparent'
+                    div.innerHTML = '<input type="file" accept=".jpg,.jpeg,.png,.webp,.gif"><n class="ico"></n>'
+                    photosInput.closest('.upload-group').before(div)
                 }
                 reader.readAsDataURL(file)
             })
         }
 
-        $('input[name="photos[]"]').on('change', function(){
-            $(this).closest('.upload-group').css({backgroundImage: '', color: ''})
+        // comment toggle: uigg.js toggles class after this runs, invert
+        $('o.toggle').addEventListener('click', function(){
+            $('input[name=comment_enabled]').value = this.classList.contains('active') ? 0 : 1
+        })
+
+        $$('.upload').forEach(upload => {
+            // click: delete image
+            upload.addEventListener('click', function(e){
+                const btn = e.target.closest('.upload-group n')
+                if (!btn) return
+                e.preventDefault()
+                const group = btn.closest('.upload-group')
+                const newIndex = group.getAttribute('data-new-index')
+                if (newIndex !== null) {
+                    selectedPhotos.splice(parseInt(newIndex), 1)
+                    refreshPhotosInput()
+                    group.remove()
+                    $$('.upload-group[data-new-index]').forEach((el, i) => {
+                        el.setAttribute('data-new-index', i)
+                    })
+                } else {
+                    group.remove()
+                }
+            })
+
+            // change: file preview & replace
+            upload.addEventListener('change', function(e){
+                const input = e.target
+                if (input.tagName !== 'INPUT' || input.type !== 'file') return
+                const group = input.closest('.upload-group')
+                if (!group) return
+
+                const newIndex = group.getAttribute('data-new-index')
+                if (newIndex !== null) {
+                    // replace newly added photo
+                    if (!input.files[0]) return
+                    selectedPhotos[parseInt(newIndex)] = input.files[0]
+                    refreshPhotosInput()
+                    const reader = new FileReader()
+                    reader.onload = ev => {
+                        group.style.backgroundImage = `url("${ev.target.result}")`
+                        group.style.color = 'transparent'
+                    }
+                    reader.readAsDataURL(input.files[0])
+                } else if (!input.multiple) {
+                    // cover or existing image preview
+                    const file = input.files[0]
+                    if (!file) return
+                    const reader = new FileReader()
+                    reader.onload = ev => {
+                        group.style.backgroundImage = `url("${ev.target.result}")`
+                        group.style.color = 'transparent'
+                    }
+                    reader.readAsDataURL(file)
+                }
+            })
+        })
+
+        // add new photos
+        photosInput.addEventListener('change', function(){
+            const addGroup = this.closest('.upload-group')
             selectedPhotos = selectedPhotos.concat(Array.from(this.files))
             refreshPhotosInput()
             renderSelectedPhotos()
-        })
-
-        $('.upload').on('change', '.upload-group[data-new-index] input[type=file]', function(){
-            var input = this,
-                group = $(input).closest('.upload-group'),
-                index = group.data('newIndex')
-            if (!this.files[0]) return
-            selectedPhotos[index] = input.files[0]
-            refreshPhotosInput()
-            var reader = new FileReader()
-            reader.onload = function(e){
-                group.css({
-                    backgroundImage: 'url("' + e.target.result + '")',
-                    color: 'transparent'
-                })
-            }
-            reader.readAsDataURL(input.files[0])
+            // uigg.js sets blob async on add-btn group; clear after event loop
+            setTimeout(() => {
+                addGroup.style.backgroundImage = ''
+                addGroup.style.color = ''
+            }, 0)
         })
     })
 </script>

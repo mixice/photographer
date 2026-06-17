@@ -16,7 +16,7 @@ $comments = $conn->query("SELECT id, name, content, created_at FROM comment WHER
 <section class="light">
     <section class="swiper swiper-banner">
         <div class="swiper-wrapper">
-        <?php $selected = array_rand(range(1, 20), 3);foreach($selected as $n) {echo '<div class="swiper-slide"><img src="images/light/' . $n . '.jpg" cover loading="lazy"></div>';}?>
+        <?php $pool = range(1, 20); $selected = array_rand($pool, 3); foreach($selected as $k) {echo '<div class="swiper-slide"><img src="images/light/' . $pool[$k] . '.jpg" cover loading="lazy"></div>';}?>
         </div>
     </section>
     <?php if ($home_ticket): ?><div class="ticket absolute-5 center anime-fade-in-up"><?php echo sanitizeHtml($home_ticket); ?></div><?php endif; ?>
@@ -27,7 +27,7 @@ $comments = $conn->query("SELECT id, name, content, created_at FROM comment WHER
         <a pop="pop" class="ico ico-wechat"></a>
         <a pop="pop" class="ico ico-qq"></a>
     </div>
-    <a class="light-next absolute-8"><i class="ico ico-alone-bottom anime-fade-in-down infinite"></i></a>
+    <a class="light-next smooth absolute-8" href="#head"><i class="ico ico-alone-bottom anime-fade-in-down infinite"></i></a>
 </section>
 <section class="photography restriction">
     <?php if ($photography_ticket): ?><div class="ticket"><?php echo sanitizeHtml($photography_ticket); ?></div><?php endif; ?>
@@ -75,9 +75,10 @@ $comments = $conn->query("SELECT id, name, content, created_at FROM comment WHER
     </pop-main>
 </pop>
 
-<script>
+<script type="module">
+    const { $, $$ } = Uigg
     //light
-    $('body').prepend($('.light'))
+    document.body.prepend($('.light'))
     var swiper = new Swiper('.swiper-banner',{
         loop: true,
         effect: 'fade',
@@ -88,16 +89,13 @@ $comments = $conn->query("SELECT id, name, content, created_at FROM comment WHER
         },
     })
 
-    //next
-    $('.light-next').click(function(){
-        var viewportHeight = window.innerHeight,
-            currentScroll = $(window).scrollTop(),
-            targetScroll = currentScroll + viewportHeight
-        $('html, body').animate({scrollTop: targetScroll},{duration: 1000,easing: 'swing',})
-    })
-
     //pop
-    $('a[pop="pop"]').click(function(){$('pop[pop="pop"] img').attr('src', `//ui.gg/lib/qr/${$(this).attr('class').match(/ico-(\w+)/)[1]}.svg`)})
+    $$('a[pop="pop"]').forEach(function(a){
+        a.addEventListener('click', function(){
+            var m = this.className.match(/ico-(\w+)/)
+            $('pop[pop="pop"] img').setAttribute('src', '//ui.gg/lib/qr/' + m[1] + '.svg')
+        })
+    })
 
 </script>
 

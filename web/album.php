@@ -76,7 +76,8 @@ $comment_pagination_base = "album.php?id=$id";
 </section>
 <?php include ('foot.php') ?>
 
-<script>
+<script type="module">
+    const { $, $$ } = Uigg
     //Swiper
     var swiper = new Swiper('.swiper-banner',{
         spaceBetween: 10,
@@ -91,16 +92,21 @@ $comment_pagination_base = "album.php?id=$id";
             prevEl: '.swiper-button-prev',
         },
     })
-    $('.album a').click(function(e){
-        e.preventDefault()
-        var href = $(this).attr('href'),
-            idx = 0
-        $('.album a').each(function(i){if ($(this).attr('href') === href) { idx = i; }})
-        swiper.slideToLoop(idx, 0)
-        $('.album-swiper').show()
+    $$('.album a').forEach(function(a){
+        a.addEventListener('click', function(e){
+            e.preventDefault()
+            var href = this.getAttribute('href'),
+                idx = 0
+            $$('.album a').forEach(function(el, i){
+                if (el.getAttribute('href') === href) { idx = i }
+            })
+            $('.album-swiper').style.display = 'block'
+            swiper.update()
+            swiper.slideToLoop(idx, 0)
+        })
     })
-    $('.album-swiper-close').click(function(){
-        $('.album-swiper').hide()
+    $('.album-swiper-close').addEventListener('click', function(){
+        $('.album-swiper').style.display = 'none'
         swiper.zoom.out()
     })
 </script>

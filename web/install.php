@@ -64,8 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <link rel="stylesheet" href="//ui.gg/lib/uigg.css">
 <link rel="stylesheet" href="styles/styles.css">
 
-<script src="//ui.gg/lib/jquery.min.js"></script>
-<script src="//ui.gg/lib/uigg.js"></script>
+<script type="module" src="//ui.gg/lib/uigg.js"></script>
 
 <style>
     .install {min-height:100vh;}

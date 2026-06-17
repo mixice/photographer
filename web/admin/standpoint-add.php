@@ -104,14 +104,15 @@ if ($msg) $msg_text = $msg === 'added' ? 'Added successfully !' : 'Saved success
     </div>
 </div>
 
-<script>
-    <?php if ($msg): ?>
-        Uigg.alert('<?php echo $msg_text; ?>')
-        history.replaceState(null,'',location.pathname+location.search.replace(/&?msg=\w+/,''))
-    <?php endif; ?>
-    $(function(){
-        $('o.toggle').click(function(){
-            $('input[name=comment_enabled]').val($(this).hasClass('active') ? 1 : 0)
+<script type="module">
+    const { $, alert } = Uigg
+    ready(() => {
+        <?php if ($msg): ?>
+            alert('<?php echo $msg_text; ?>')
+            history.replaceState(null,'',location.pathname+location.search.replace(/&?msg=\w+/,''))
+        <?php endif; ?>
+        $('o.toggle').addEventListener('click', function(){
+            $('input[name=comment_enabled]').value = this.classList.contains('active') ? 0 : 1
         })
     })
 </script>
