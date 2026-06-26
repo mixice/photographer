@@ -50,13 +50,11 @@ $csrf = csrfToken();
 <div class="contant">
     <div class="title"><h5>page list</h5><u></u><a class="btn" href="page-add.php">add</a></div>
     <div class="item">
-        <div class="form filter">
-            <form method="GET">
-                <input type="hidden" name="page" value="1">
-                <li><input type="text" name="keyword" value="<?php echo htmlspecialchars($keyword); ?>"></li>
-                <li><button class="btn">search</button></li>
-            </form>
-        </div>
+        <form class="form filter" method="GET">
+            <input type="hidden" name="page" value="1">
+            <li><input type="text" name="keyword" value="<?php echo htmlspecialchars($keyword); ?>"></li>
+            <li><button class="btn">search</button></li>
+        </form>
         <div class="table">
             <table>
                 <thead>

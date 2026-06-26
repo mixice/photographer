@@ -66,34 +66,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <script type="module" src="//ui.gg/lib/uigg.js"></script>
 
-<style>
-    .install {min-height:100vh;}
-    .install-main {padding: 30px;width:500px;max-width:90vw;}
-    .install-title {padding-bottom: 20px;position: relative;}
-    .install-title i {font-size: 70px;}
-    .error {color:var(--red);text-align:center;padding:0 0 10px;}
-    .form .btn {width:100%;margin:20px 0 0;}
-    .form li * {margin: 0;}
-    .form li *:last-child {flex: 1;}
-    .form li.resolve {padding-left: 100px;}
-</style>
-
 </head>
 <body>
 <section class="install center">
     <section class="install-main">
         <div class="install-title center"><i class="ico ico-m"></i></div>
-        <?php if ($error): ?><div class="error"><?php echo htmlspecialchars($error); ?></div><?php endif; ?>
+        <?php if ($error): ?><div class="bloomer"><?php echo htmlspecialchars($error); ?></div><?php endif; ?>
         <form method="POST" class="form">
             <reminder>This system supports PHP and MYSQL</reminder>
-            <li><span>host</span><input type="text" name="host" value="localhost" required></li>
-            <li><span>db name</span><input type="text" name="name" required></li>
-            <li><span>db user</span><input type="text" name="user" required></li>
-            <li><span>db password</span><input type="password" name="pass"></li>
-            <li><span>title</span><input type="text" name="title" required></li>
-            <li><span>account</span><input type="text" name="account" required></li>
-            <li><span>password</span><div class="input"><input type="password" name="pwd" required><o class="password"></o></div></li>
-            <li class="resolve"><button class="btn" type="submit">install</button></li>
+            <li><label>host</label><input type="text" name="host" value="localhost" required></li>
+            <li><label>db name</label><input type="text" name="name" required></li>
+            <li><label>db user</label><input type="text" name="user" required></li>
+            <li><label>db password</label><input type="password" name="pass"></li>
+            <li><label>title</label><input type="text" name="title" required></li>
+            <li><label>account</label><input type="text" name="account" required></li>
+            <li><label>password</label><div class="input"><input type="password" name="pwd" required><o class="password"></o></div></li>
+            <li><button class="btn" type="submit">install</button></li>
         </form>
     </section>
 </section>

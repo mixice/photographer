@@ -124,7 +124,7 @@ menu-cont li a.active::after {width: 100%;}
 /* form */
 ::-webkit-input-placeholder {color: var(--color);}
 .form li input,
-.form li textarea {background-color: transparent;border-bottom: 1px var(--color) solid;padding: 0;}
+.form li textarea {background-color: transparent;border: var(--color) solid;border-width: 0 0 1px 0;padding: 0;}
 
 /* page */
 page {margin-top: 60px;}
@@ -166,6 +166,27 @@ article table th,
 article table td {border-width: 1px;padding: 10px 0;}
 
 article blockquote {padding: 20px;background-color: var(--f7);border-left: 5px var(--ccc) solid;font-style: italic;}
+
+/* install */
+.install {min-height:100vh;
+    .install-main {width:90vw;max-width:500px;}
+    .install-title {padding-bottom: 20px;position: relative;
+        i {font-size: 96px;}
+    }
+    reminder {padding: 15px;}
+    .bloomer {margin: 0;}
+    .form {
+        .btn {width:100%;margin:40px 0 0;}
+        li {
+            * {margin: 0;}
+            *:last-child {flex: 1;}
+        }
+    }
+}
+
+
+
+
 
 
 
@@ -275,6 +296,15 @@ article blockquote {padding: 20px;background-color: var(--f7);border-left: 5px v
     article table td {padding: .1rem 0;}
 
     article blockquote {padding: .2rem;}
+
+    /* install */
+    .install {
+        .install-title {padding-bottom: .2rem;
+            i {font-size: 1rem;}
+        }
+        reminder {padding: .2rem;}
+        .form .btn {margin:.4rem 0 0;}
+    }
 
 }
 

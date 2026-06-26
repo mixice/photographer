@@ -133,18 +133,18 @@ if ($msg) $msg_text = $msg === 'added' ? 'Added successfully !' : 'Saved success
         <section class="form">
             <form method="POST" enctype="multipart/form-data">
                 <?php if ($id): ?><input type="hidden" name="id" value="<?php echo $id; ?>"><?php endif; ?>
-                <li><span>title</span><input class="wide-80" type="text" name="title" value="<?php echo $title_val; ?>" required></li>
-                <li><span>date</span><input class="wide-20" type="date" name="created_at" value="<?php echo $date_val; ?>"></li>
-                <li><span>comment</span><label><o class="toggle<?php echo $comment_active; ?>"></o><input type="hidden" name="comment_enabled" value="<?php echo $comment_val; ?>"></label></li>
-                <li><span>cover</span>
+                <li><label>title</label><input class="wide-80" type="text" name="title" value="<?php echo $title_val; ?>" required></li>
+                <li><label>date</label><input class="wide-20" type="date" name="created_at" value="<?php echo $date_val; ?>"></li>
+                <li><label>comment</label><label><o class="toggle<?php echo $comment_active; ?>"></o><input type="hidden" name="comment_enabled" value="<?php echo $comment_val; ?>"></label></li>
+                <li><label>cover</label>
                     <div class="upload">
                         <div class="ico upload-group" <?php if ($cover_val): ?>style="background-image: url('<?php echo htmlspecialchars($cover_val); ?>');color: transparent"<?php endif; ?>>
                             <input type="file" name="cover" accept=".jpg,.jpeg,.png,.webp,.gif">
                         </div>
                     </div>
-                    <cite>500x500px</cite>
+                    <hint>500x500px</hint>
                 </li>
-                <li><span>album</span>
+                <li><label>album</label>
                     <div class="upload wide">
                         <!-- 上传以后的图片，每张图片都以这段代码显示，这段代码里，点击input是更换，点击n是删除，这些功能的前端效果已经有了，只要程序功能-->
                         <?php foreach ($images_val as $image): ?>

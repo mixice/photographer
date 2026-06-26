@@ -33,7 +33,8 @@ $site_title = htmlspecialchars($settings['title'] ?? 'Admin', ENT_QUOTES, 'UTF-8
 
 <link rel="shortcut icon" href="../images/ico.svg">
 <link rel="stylesheet" href="//ui.gg/lib/uigg.css">
-<link rel="stylesheet" href="styles/admin.css">
+<link rel="stylesheet" href="//ui.gg/uigg/admin/styles/admin.css">
+<link rel="stylesheet" href="styles/styles.css">
 
 <script src="//ui.gg/lib/editor/editor.js"></script>
 <script type="module" src="//ui.gg/lib/uigg.js"></script>
