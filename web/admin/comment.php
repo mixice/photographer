@@ -84,40 +84,38 @@ $csrf = csrfToken();
                 <li><button class="btn">search</button></li>
             </form>
         </div>
-        <div class="table">
-            <table>
-                <thead>
-                    <tr><th>ID</th><td>name</td><td>email</td><td>comment</td><td>type</td><td>time</td><td>display</td><td>control</td></tr>
-                </thead>
-                <tbody>
-                    <?php if (!empty($list)): ?>
-                        <?php foreach ($list as $row): ?>
-                        <?php
-                        if ($row['target_type'] === 'page') {
-                            $link = '/page.php?slug=' . urlencode($page_slugs[$row['target_id']] ?? '');
-                        } else {
-                            $link = '/article.php?type=' . $row['target_type'] . '&id=' . $row['target_id'];
-                        }
-                        ?>
-                        <tr>
-                            <th><?php echo $row['id']; ?></th>
-                            <td><?php echo htmlspecialchars($row['name']); ?></td>
-                            <td><?php echo htmlspecialchars($row['email'] ?? '-'); ?></td>
-                            <td><?php echo htmlspecialchars(mb_substr($row['content'], 0, 50)); ?></td>
-                            <td><?php echo htmlspecialchars($row['target_type']); ?></td>
-                            <td><?php echo substr($row['created_at'], 0, 10); ?></td>
-                            <td><o class="toggle<?php echo $row['status'] ? ' active' : ''; ?>" onclick="location.href='comment.php?action=toggle&id=<?php echo $row['id']; ?>&page=<?php echo $current_page; ?>'"></o></td>
-                            <td><a class="ico ico-link" href="<?php echo htmlspecialchars($link, ENT_QUOTES, 'UTF-8'); ?>" target="_blank"></a>
-                                <button type="button" class="ico ico-delete co-red" onclick="del(<?=$row['id']?>)"></button>
-                            </td>
-                        </tr>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <tr><td colspan="100">Empty</td></tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
-        </div>
+        <table  class="table">
+            <thead>
+                <tr><th>ID</th><td>name</td><td>email</td><td>comment</td><td>type</td><td>time</td><td>display</td><td>control</td></tr>
+            </thead>
+            <tbody>
+                <?php if (!empty($list)): ?>
+                    <?php foreach ($list as $row): ?>
+                    <?php
+                    if ($row['target_type'] === 'page') {
+                        $link = '/page.php?slug=' . urlencode($page_slugs[$row['target_id']] ?? '');
+                    } else {
+                        $link = '/article.php?type=' . $row['target_type'] . '&id=' . $row['target_id'];
+                    }
+                    ?>
+                    <tr>
+                        <th><?php echo $row['id']; ?></th>
+                        <td><?php echo htmlspecialchars($row['name']); ?></td>
+                        <td><?php echo htmlspecialchars($row['email'] ?? '-'); ?></td>
+                        <td><?php echo htmlspecialchars(mb_substr($row['content'], 0, 50)); ?></td>
+                        <td><?php echo htmlspecialchars($row['target_type']); ?></td>
+                        <td><?php echo substr($row['created_at'], 0, 10); ?></td>
+                        <td><o class="toggle<?php echo $row['status'] ? ' active' : ''; ?>" onclick="location.href='comment.php?action=toggle&id=<?php echo $row['id']; ?>&page=<?php echo $current_page; ?>'"></o></td>
+                        <td><a class="ico ico-link" href="<?php echo htmlspecialchars($link, ENT_QUOTES, 'UTF-8'); ?>" target="_blank"></a>
+                            <button type="button" class="ico ico-delete co-red" onclick="del(<?=$row['id']?>)"></button>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <tr><td colspan="100">Empty</td></tr>
+                <?php endif; ?>
+            </tbody>
+        </table>
         <page total="<?php echo $total; ?>" page="<?php echo $current_page; ?>" limit="<?php echo $page_size; ?>" param="page"></page>
     </div>
 </div>

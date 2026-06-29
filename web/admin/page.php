@@ -55,31 +55,29 @@ $csrf = csrfToken();
             <li><input type="text" name="keyword" value="<?php echo htmlspecialchars($keyword); ?>"></li>
             <li><button class="btn">search</button></li>
         </form>
-        <div class="table">
-            <table>
-                <thead>
-                    <tr><th>ID</th><td>title</td><td>url</td><td>time</td><td>control</td></tr>
-                </thead>
-                <tbody>
-                    <?php if ($list->num_rows > 0): ?>
-                        <?php while ($row = $list->fetch_assoc()): ?>
-                        <tr>
-                            <th><?php echo $row['id']; ?></th>
-                            <td><?php echo htmlspecialchars($row['title']); ?></td>
-                            <td><?php echo htmlspecialchars($row['slug']); ?></td>
-                            <td><?php echo substr($row['created_at'], 0, 10); ?></td>
-                            <td><a class="ico ico-link" href="/page.php?slug=<?=htmlspecialchars($row['slug'])?>" target="_blank"></a>
-                                <a class="ico ico-edit co-green" href="page-add.php?id=<?php echo $row['id']; ?>"></a>
-                                <button type="button" class="ico ico-delete co-red" onclick="del(<?=$row['id']?>)"></button>
-                            </td>
-                        </tr>
-                        <?php endwhile; ?>
-                    <?php else: ?>
-                        <tr><td colspan="100">Empty</td></tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
-        </div>
+        <table class="table">
+            <thead>
+                <tr><th>ID</th><td>title</td><td>url</td><td>time</td><td>control</td></tr>
+            </thead>
+            <tbody>
+                <?php if ($list->num_rows > 0): ?>
+                    <?php while ($row = $list->fetch_assoc()): ?>
+                    <tr>
+                        <th><?php echo $row['id']; ?></th>
+                        <td><?php echo htmlspecialchars($row['title']); ?></td>
+                        <td><?php echo htmlspecialchars($row['slug']); ?></td>
+                        <td><?php echo substr($row['created_at'], 0, 10); ?></td>
+                        <td><a class="ico ico-link" href="/page.php?slug=<?=htmlspecialchars($row['slug'])?>" target="_blank"></a>
+                            <a class="ico ico-edit co-green" href="page-add.php?id=<?php echo $row['id']; ?>"></a>
+                            <button type="button" class="ico ico-delete co-red" onclick="del(<?=$row['id']?>)"></button>
+                        </td>
+                    </tr>
+                    <?php endwhile; ?>
+                <?php else: ?>
+                    <tr><td colspan="100">Empty</td></tr>
+                <?php endif; ?>
+            </tbody>
+        </table>
         <page total="<?php echo $total; ?>" page="<?php echo $current_page; ?>" limit="<?php echo $page_size; ?>" param="page"></page>
     </div>
 </div>

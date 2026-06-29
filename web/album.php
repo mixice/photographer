@@ -64,49 +64,33 @@ $comment_pagination_base = "album.php?id=$id";
 </section>
 
 <?php include __DIR__ . '/includes/comment-section.php'; ?>
-<section class="swiper swiper-banner album-swiper anime-fade-in" style="display:none">
-    <div class="swiper-wrapper">
+
+<swiper loop class="album-swiper anime-fade-in" style="display:none">
+    <swiper-wrapper>
         <?php foreach ($images as $image): ?>
-        <div class="swiper-slide"><div class="swiper-zoom-container"><img src="<?php echo htmlspecialchars($image); ?>" loading="lazy"></div></div>
+            <swiper-slide><img contain src="<?php echo htmlspecialchars($image); ?>" loading="lazy"></swiper-slide>
         <?php endforeach; ?>
-    </div>
-    <div class="swiper-button-next"></div>
-    <div class="swiper-button-prev"></div>
+    </swiper-wrapper>
+    <swiper-arrow></swiper-arrow>
     <a class="album-swiper-close ico ico-close"></a>
-</section>
+</swiper>
+
+
 <?php include ('foot.php') ?>
 
 <script type="module">
     const { $, $$ } = Uigg
-    //Swiper
-    var swiper = new Swiper('.swiper-banner',{
-        spaceBetween: 10,
-        loop: true,
-        keyboard: {enabled: true},
-        zoom: {
-            maxRatio: 3,
-            limitToOriginalSize: true
-        },
-        navigation: {
-            nextEl: '.swiper-button-next',
-            prevEl: '.swiper-button-prev',
-        },
-    })
-    $$('.album a').forEach(function(a){
-        a.addEventListener('click', function(e){
+    const albumSwiper = $('.album-swiper')
+    $$('.album a').forEach(function(a, i) {
+        a.addEventListener('click', function(e) {
             e.preventDefault()
-            var href = this.getAttribute('href'),
-                idx = 0
-            $$('.album a').forEach(function(el, i){
-                if (el.getAttribute('href') === href) { idx = i }
-            })
-            $('.album-swiper').style.display = 'block'
-            swiper.update()
-            swiper.slideToLoop(idx, 0)
+            albumSwiper.style.display = 'block'
+            albumSwiper.offsetHeight
+            albumSwiper.slideTo(i, false)
         })
     })
-    $('.album-swiper-close').addEventListener('click', function(){
-        $('.album-swiper').style.display = 'none'
-        swiper.zoom.out()
+
+    $('.album-swiper-close').addEventListener('click', function() {
+        albumSwiper.style.display = 'none'
     })
 </script>

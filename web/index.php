@@ -1,24 +1,24 @@
 <?php
 include ('head.php');
 
-$settings = getSettings($conn);
+$settings = getSettings(db());
 $home_ticket = $settings['home_ticket'] ?? '';
 $site_description = $settings['description'] ?? '';
 $photography_ticket = $settings['photography_ticket'] ?? '';
 $standpoint_ticket = $settings['standpoint_ticket'] ?? '';
 $comment_ticket = $settings['comment_ticket'] ?? '';
 
-$photos = $conn->query("SELECT id, title, cover, created_at FROM photography ORDER BY created_at DESC LIMIT 30");
-$articles = $conn->query("SELECT id, title, cover, content, created_at FROM standpoint ORDER BY created_at DESC LIMIT 2");
-$comments = $conn->query("SELECT id, name, content, created_at FROM comment WHERE status=1 ORDER BY created_at DESC LIMIT 5");
+$photos = db()->query("SELECT id, title, cover, created_at FROM photography ORDER BY created_at DESC LIMIT 30");
+$articles = db()->query("SELECT id, title, cover, content, created_at FROM standpoint ORDER BY created_at DESC LIMIT 2");
+$comments = db()->query("SELECT id, name, content, created_at FROM comment WHERE status=1 ORDER BY created_at DESC LIMIT 5");
 ?>
 
 <section class="light">
-    <section class="swiper swiper-banner">
-        <div class="swiper-wrapper">
-        <?php $pool = range(1, 20); $selected = array_rand($pool, 3); foreach($selected as $k) {echo '<div class="swiper-slide"><img src="images/light/' . $pool[$k] . '.jpg" cover loading="lazy"></div>';}?>
-        </div>
-    </section>
+    <swiper loop autoplay="3">
+        <swiper-wrapper>
+            <?php $pool = range(1, 20); $selected = array_rand($pool, 3); foreach($selected as $k) {echo '<swiper-slide><img src="images/light/' . $pool[$k] . '.jpg" cover loading="lazy"></swiper-slide>';}?>
+        </swiper-wrapper>
+    </swiper>
     <?php if ($home_ticket): ?><div class="ticket absolute-5 center anime-fade-in-up"><?php echo sanitizeHtml($home_ticket); ?></div><?php endif; ?>
     <div class="light-logo absolute-2 anime-fade-in-down"><i class="ico ico-m"></i></div>
     <div class="light-txt absolute-7 anime-fade-in-up"><h3><?php echo $site_title; ?><br>photographer</h3><span><?php echo htmlspecialchars($site_description) ?: 'Freeze the important moments in life'; ?></span></div>
@@ -77,17 +77,9 @@ $comments = $conn->query("SELECT id, name, content, created_at FROM comment WHER
 
 <script type="module">
     const { $, $$ } = Uigg
+
     //light
     document.body.prepend($('.light'))
-    var swiper = new Swiper('.swiper-banner',{
-        loop: true,
-        effect: 'fade',
-        simulateTouch: false,
-        autoplay: {
-            delay: 5000,
-            disableOnInteraction: false,
-        },
-    })
 
     //pop
     $$('a[pop="pop"]').forEach(function(a){

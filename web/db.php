@@ -18,6 +18,11 @@ if ($conn->connect_error) {
 $conn->set_charset("utf8mb4");
 
 // ---------------------------------------------------------------------------------------------settings
+function db() {
+    global $conn;
+    return $conn;
+}
+
 function getSettings($conn, $refresh = false) {
     static $settings = null;
     if ($refresh) {

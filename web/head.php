@@ -23,11 +23,9 @@ $slug = $_GET['slug'] ?? '';
 <title><?php echo $site_title; ?> Photographer</title>
 
 <link rel="shortcut icon" href="images/ico.svg">
-<link rel="stylesheet" href="//ui.gg/lib/swiper-bundle.min.css">
 <link rel="stylesheet" href="//ui.gg/lib/uigg.css">
 <link rel="stylesheet" href="styles/styles.css">
 
-<script src="//ui.gg/lib/swiper-bundle.min.js"></script>
 <script type="module" src="//ui.gg/lib/uigg.js"></script>
 
 <script defer src="//u.mssay.com/script.js" data-website-id="ebe5c624-85c8-429a-b492-03563b176328"></script>
