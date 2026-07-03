@@ -80,6 +80,9 @@ $site_title = htmlspecialchars($settings['title'] ?? 'Admin', ENT_QUOTES, 'UTF-8
                 <fold-group>
                     <fold-title><a href="page.php"><i class="ico ico-document"></i>page</a></fold-title>
                 </fold-group>
+                <fold-group>
+                    <fold-title><a href="update.php"><i class="ico ico-download"></i>update</a></fold-title>
+                </fold-group>
                 <h6>other</h6>
                 <fold-group>
                     <fold-title><a href="comment.php"><i class="ico ico-talk-info"></i>comment</a></fold-title>
