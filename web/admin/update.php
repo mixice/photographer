@@ -2,39 +2,41 @@
 include ('head.php');
 
 $version_file = dirname(__DIR__) . '/version.json';
-$local = json_decode(file_get_contents($version_file), true) ?: ['version' => '0.0.0', 'build' => '', 'description' => ''];
+$local = ['version' => '0.0.0', 'build' => ''];
+if (file_exists($version_file)) {
+    $local = json_decode(file_get_contents($version_file), true) ?: $local;
+}
 
 $github_user = 'mixice';
 $github_repo = 'photographer';
 $github_branch = 'main';
-$raw_url = "https://raw.githubusercontent.com/{$github_user}/{$github_repo}/{$github_branch}/version.json";
+$repo_sub = 'web'; // subdirectory inside the repo where project files live
+$raw_url = "https://raw.githubusercontent.com/{$github_user}/{$github_repo}/{$github_branch}/{$repo_sub}/version.json";
 $zip_url = "https://github.com/{$github_user}/{$github_repo}/archive/refs/heads/{$github_branch}.zip";
 
 $message = '';
 $message_type = '';
 $remote = null;
-$checked = false;
 
 $action = $_GET['action'] ?? ($_POST['action'] ?? '');
 
 // ------------------------------------------------------------------ check
 if ($action === 'check') {
-    $checked = true;
     $ctx = stream_context_create(['http' => ['timeout' => 15, 'user_agent' => 'Photographer-Updater/1.0']]);
     $json = @file_get_contents($raw_url, false, $ctx);
     if ($json === false) {
-        $message = '无法连接到 GitHub，请检查网络或 GitHub 是否可访问';
+        $message = 'Cannot connect to GitHub. Please check your network or DNS.';
         $message_type = 'error';
     } else {
         $remote = json_decode($json, true);
         if (!$remote || empty($remote['version'])) {
-            $message = '远程版本信息格式错误';
+            $message = 'Remote version info is malformed.';
             $message_type = 'error';
         } elseif (version_compare($remote['version'], $local['version'], '>')) {
-            $message = '发现新版本 v' . htmlspecialchars($remote['version']) . ' —— ' . htmlspecialchars($remote['description'] ?? '');
+            $message = 'New version found: v' . htmlspecialchars($remote['version']);
             $message_type = 'success';
         } else {
-            $message = '已是最新版本 v' . htmlspecialchars($local['version']);
+            $message = 'You are already on the latest version v' . htmlspecialchars($local['version']);
             $message_type = 'info';
         }
     }
@@ -42,9 +44,8 @@ if ($action === 'check') {
 
 // ------------------------------------------------------------------ do update
 if ($action === 'update') {
-    $checked = true;
     if (!class_exists('ZipArchive')) {
-        $message = '服务器未安装 ZipArchive 扩展，无法自动更新';
+        $message = 'ZipArchive extension is not installed. Cannot auto-update.';
         $message_type = 'error';
     } else {
         // download
@@ -53,10 +54,10 @@ if ($action === 'update') {
         $zip_data = @file_get_contents($zip_url, false, $ctx);
 
         if ($zip_data === false) {
-            $message = '下载更新包失败，请检查网络';
+            $message = 'Failed to download update package. Check your network.';
             $message_type = 'error';
         } elseif (file_put_contents($tmp_zip, $zip_data) === false) {
-            $message = '写入临时文件失败，请检查磁盘权限';
+            $message = 'Failed to write temp file. Check disk permissions.';
             $message_type = 'error';
         } else {
             // extract
@@ -65,15 +66,16 @@ if ($action === 'update') {
 
             $zip = new ZipArchive();
             if ($zip->open($tmp_zip) !== true) {
-                $message = '解压更新包失败，文件可能已损坏';
+                $message = 'Failed to extract update package. File may be corrupted.';
                 $message_type = 'error';
             } else {
                 $zip->extractTo($tmp_dir);
                 $zip->close();
 
-                // github zip has a top-level folder like "photographer-main"
+                // github zip structure: photographer-main/web/...
                 $inner_dirs = glob($tmp_dir . '/*', GLOB_ONLYDIR);
-                $src_root = !empty($inner_dirs) ? $inner_dirs[0] : $tmp_dir;
+                $repo_root = !empty($inner_dirs) ? $inner_dirs[0] : $tmp_dir;
+                $src_root = is_dir($repo_root . '/' . $repo_sub) ? $repo_root . '/' . $repo_sub : $repo_root;
 
                 $project_root = dirname(__DIR__);
                 $protected = ['db.php', 'uploads', 'install.lock'];
@@ -94,7 +96,7 @@ if ($action === 'update') {
                     // check protected
                     $skip = false;
                     foreach ($protected as $p) {
-                        if ($rel_path === $p || strpos($rel_path, $p . '/') === 0 || strpos($rel_path, $p . '\\') === 0) {
+                        if ($rel_path === $p || strpos($rel_path, $p . '/') === 0) {
                             $skip = true;
                             break;
                         }
@@ -116,7 +118,7 @@ if ($action === 'update') {
                         if (copy($file->getPathname(), $dest)) {
                             $copied++;
                         } else {
-                            $errors[] = '复制失败: ' . $rel_path;
+                            $errors[] = 'copy failed: ' . $rel_path;
                         }
                     }
                 }
@@ -131,10 +133,10 @@ if ($action === 'update') {
                 }
 
                 if (empty($errors)) {
-                    $message = "更新完成！已覆盖 {$copied} 个文件，保留 {$skipped} 个受保护文件（db.php、uploads/ 等）";
+                    $message = "Update complete. {$copied} file(s) overwritten, {$skipped} protected file(s) preserved.";
                     $message_type = 'success';
                 } else {
-                    $message = "更新部分完成，{$copied} 个文件成功，但以下文件失败：" . implode('、', $errors);
+                    $message = "Update partially complete. {$copied} file(s) succeeded, errors: " . implode(', ', $errors);
                     $message_type = 'error';
                 }
             }
@@ -158,6 +160,9 @@ function deleteDir($dir) {
     }
     rmdir($dir);
 }
+
+// escape message for JS
+$js_msg = json_encode($message);
 ?>
 
 <div class="title"><h4>system update</h4></div>
@@ -171,42 +176,46 @@ function deleteDir($dir) {
 
         <div class="article">
             <li>
-                <span>current version</span>
+                <span>Current version</span>
                 <span class="co-sapphire"><strong>v<?php echo htmlspecialchars($local['version']); ?></strong></span>
             </li>
             <li>
-                <span>build date</span>
+                <span>Build date</span>
                 <span><?php echo htmlspecialchars($local['build'] ?? '-'); ?></span>
             </li>
-            <?php if ($remote && version_compare($remote['version'], $local['version'], '>')): ?>
+            <?php if ($remote): ?>
             <li>
-                <span>latest version</span>
-                <span class="co-green"><strong>v<?php echo htmlspecialchars($remote['version']); ?></strong></span>
-            </li>
-            <li>
-                <span>update log</span>
-                <span><?php echo nl2br(htmlspecialchars($remote['description'] ?? '-')); ?></span>
+                <span>remote version</span>
+                <span class="<?php echo version_compare($remote['version'], $local['version'], '>') ? 'co-green' : ''; ?>"><strong>v<?php echo htmlspecialchars($remote['version']); ?></strong></span>
             </li>
             <?php endif; ?>
         </div>
 
         <div class="form" style="margin-top:16px">
             <?php if ($remote && version_compare($remote['version'], $local['version'], '>')): ?>
-            <form method="POST" onsubmit="return confirm('确定要更新到 v<?php echo htmlspecialchars($remote['version']); ?> 吗？\n\n更新将覆盖除 db.php 和 uploads/ 外的所有文件。建议先备份。')">
+            <form method="POST" id="update-form">
                 <input type="hidden" name="action" value="update">
-                <button type="submit" class="btn co-green">更新到 v<?php echo htmlspecialchars($remote['version']); ?></button>
+                <button type="submit" class="btn co-green">update to v<?php echo htmlspecialchars($remote['version']); ?></button>
             </form>
             <?php else: ?>
-            <a href="?action=check" class="btn btn-med">check for updates</a>
+            <a href="?action=check" class="btn btn-submit">check for updates</a>
             <?php endif; ?>
         </div>
 
         <reminder style="margin-top:16px">
-            受保护文件：db.php、uploads/ 目录、install.lock —— 更新时不会被覆盖。<br>
-            更新来源：GitHub raw (raw.githubusercontent.com)，请确保服务器可访问 GitHub。
+            <p>Protected files: db.php, uploads/, install.lock</p>
+            <p>Update source: GitHub raw (raw.githubusercontent.com)</p>
         </reminder>
     </div>
 </div>
+
+<?php if ($message): ?>
+<script>
+    ready(function () {
+        Uigg.alert('<?php echo $js_msg; ?>')
+    })
+</script>
+<?php endif; ?>
 
 
 </section>
