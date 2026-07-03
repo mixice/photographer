@@ -1,5 +1,6 @@
 <?php
-include ('head.php');
+if (!file_exists(__DIR__ . '/install.lock')) { header('Location: install.php'); exit(); }
+require_once('db.php');
 require_once __DIR__ . '/includes/comment.php';
 
 $slug = isset($_GET['slug']) ? trim($_GET['slug']) : '';
@@ -27,6 +28,8 @@ $comment_msg = $_GET['msg'] ?? '';
 extract(getCommentPagination($conn, 'page', $row['id']));
 $comment_form_action = "?slug=" . urlencode($slug);
 $comment_pagination_base = "?slug=" . urlencode($slug);
+
+include ('head.php');
 ?>
 
 <section class="article">

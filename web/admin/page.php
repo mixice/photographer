@@ -52,8 +52,8 @@ $csrf = csrfToken();
     <div class="item">
         <form class="form filter" method="GET">
             <input type="hidden" name="page" value="1">
-            <li><input type="text" name="keyword" value="<?php echo htmlspecialchars($keyword); ?>"></li>
-            <li><button class="btn">search</button></li>
+            <item><cont><input type="text" name="keyword" value="<?php echo htmlspecialchars($keyword); ?>"></cont></item>
+            <item><cont><button class="btn">search</button></cont></item>
         </form>
         <table class="table">
             <thead>

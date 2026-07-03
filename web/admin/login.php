@@ -58,14 +58,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <div class="login-main anime-zoom-in">
         <div class="login-title"><h1 class="logo center"><i></i><span>mix<em>ice</em></span></h1></div>
         <div class="login-cont">
-            <div class="form login-form">
-                <form method="POST">
-                    <li><i class="ico ico-user"></i><input type="text" name="account" required></li>
-                    <li><i class="ico ico-password"></i><div class="input"><input type="password" name="password" required><o class="password"></o></div></li>
-                    <div class="bloomer" <?php if(isset($_SESSION['error'])){echo 'show';unset($_SESSION['error']);} ?>>Account and password is error</div>
-                    <li><button type="submit" class="btn">login</button></li>
-                </form>
-            </div>
+            <form class="form login-form" method="POST">
+                <item><i class="ico ico-user"></i><cont><input type="text" name="account" required></cont></item>
+                <item><i class="ico ico-password"></i><cont><div class="input"><input type="password" name="password" required><o class="password"></o></div></cont></item>
+                <div class="bloomer" <?php if(isset($_SESSION['error'])){echo 'show';unset($_SESSION['error']);} ?>>Account and password is error</div>
+                <item><cont><button type="submit" class="btn">login</button></cont></item>
+            </form>
         </div>
     </div>
 </section>

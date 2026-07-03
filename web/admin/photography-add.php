@@ -1,15 +1,19 @@
 <?php
-include ('head.php');
+ob_start();
+error_reporting(0);
+require_once('../db.php');
 
-$id = isset($_GET['id']) ? intval($_GET['id']) : 0;
-$row = null;
-if ($id) {
-    $row_stmt = $conn->prepare("SELECT * FROM photography WHERE id = ?");
-    $row_stmt->bind_param('i', $id);
-    $row_stmt->execute();
-    $row = $row_stmt->get_result()->fetch_assoc();
-    $row_stmt->close();
+// Auth — replicate head.php check for AJAX POST
+if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        echo json_encode(['error' => 'Unauthorized'], JSON_UNESCAPED_SLASHES);
+        exit;
+    }
+    header('Location: login.php');
+    exit;
 }
+
+$id = intval($_POST['id'] ?? $_GET['id'] ?? 0);
 
 $upload_dir = '/uploads/photography/';
 $upload_path = $_SERVER['DOCUMENT_ROOT'] . $upload_dir;
@@ -27,12 +31,22 @@ function uploadPhotographyImage($file, $upload_path, $upload_dir) {
     return '';
 }
 
+// POST — must run before head.php to keep JSON output clean
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    ob_clean();
+    $row = null;
+    if ($id) {
+        $row_stmt = $conn->prepare("SELECT * FROM photography WHERE id = ?");
+        $row_stmt->bind_param('i', $id);
+        $row_stmt->execute();
+        $row = $row_stmt->get_result()->fetch_assoc();
+        $row_stmt->close();
+    }
+
     $title = trim($_POST['title'] ?? '');
-    $comment_enabled = !empty($_POST['comment_enabled']) ? 1 : 0;
+    $comment_enabled = isset($_POST['comment_enabled']) && $_POST['comment_enabled'] === 'true' ? 1 : 0;
     $date_input = trim($_POST['created_at'] ?? '');
     if ($date_input) {
-        // 编辑时保留原时分秒，新增时用当前时间
         if ($id && $row && $row['created_at']) {
             $time_part = substr($row['created_at'], 11, 8);
             $created_at = $date_input . ' ' . ($time_part ?: date('H:i:s'));
@@ -43,37 +57,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $created_at = $id && $row && $row['created_at'] ? $row['created_at'] : date('Y-m-d H:i:s');
     }
     $cover = $row['cover'] ?? '';
-    $images = isset($_POST['images']) && is_array($_POST['images']) ? array_values(array_filter($_POST['images'])) : [];
-    $old_images = $id ? extractImageUrlsFromJson($row['images'] ?? '') : [];
-
-    if (isset($_FILES['cover'])) {
+    // cover via <images name="cover"> — single File or URL string
+    if (isset($_FILES['cover']) && $_FILES['cover']['error'] === UPLOAD_ERR_OK) {
         $new_cover = uploadPhotographyImage($_FILES['cover'], $upload_path, $upload_dir);
         if ($new_cover) $cover = $new_cover;
     }
-
-    if (isset($_FILES['replace_images']) && is_array($_FILES['replace_images']['name'])) {
-        foreach ($_FILES['replace_images']['name'] as $index => $name) {
-            if (!isset($images[$index]) || $_FILES['replace_images']['error'][$index] !== UPLOAD_ERR_OK) continue;
-            $file = [
-                'name' => $name,
-                'type' => $_FILES['replace_images']['type'][$index],
-                'tmp_name' => $_FILES['replace_images']['tmp_name'][$index],
-                'error' => $_FILES['replace_images']['error'][$index],
-                'size' => $_FILES['replace_images']['size'][$index],
-            ];
-            $url = uploadPhotographyImage($file, $upload_path, $upload_dir);
-            if ($url) $images[$index] = $url;
-        }
+    if (isset($_POST['cover']) && is_string($_POST['cover']) && $_POST['cover'] !== '') {
+        $cover = $_POST['cover'];
     }
+    $images = isset($_POST['images']) && is_array($_POST['images']) ? array_values(array_filter($_POST['images'], 'is_string')) : [];
+    $old_images = $id ? extractImageUrlsFromJson($row['images'] ?? '') : [];
 
-    if (isset($_FILES['photos']) && is_array($_FILES['photos']['name'])) {
-        foreach ($_FILES['photos']['name'] as $index => $name) {
+    if (isset($_FILES['images']) && is_array($_FILES['images']['name'])) {
+        foreach ($_FILES['images']['name'] as $index => $name) {
+            if ($_FILES['images']['error'][$index] !== UPLOAD_ERR_OK) continue;
             $file = [
                 'name' => $name,
-                'type' => $_FILES['photos']['type'][$index],
-                'tmp_name' => $_FILES['photos']['tmp_name'][$index],
-                'error' => $_FILES['photos']['error'][$index],
-                'size' => $_FILES['photos']['size'][$index],
+                'type' => $_FILES['images']['type'][$index],
+                'tmp_name' => $_FILES['images']['tmp_name'][$index],
+                'error' => $_FILES['images']['error'][$index],
+                'size' => $_FILES['images']['size'][$index],
             ];
             $url = uploadPhotographyImage($file, $upload_path, $upload_dir);
             if ($url) $images[] = $url;
@@ -85,7 +88,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $images_json = json_encode($images, JSON_UNESCAPED_SLASHES);
 
     if (empty($title)) {
-        echo "<script>Uigg.alert('Title is required !')</script>";
+        echo json_encode(['error' => 'Title is required !'], JSON_UNESCAPED_SLASHES);
+        exit();
     } elseif ($id) {
         $removed = array_diff(array_merge([$row['cover'] ?? ''], $old_images), array_merge([$cover], $images));
         deleteFilesByUrls($removed);
@@ -93,33 +97,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             $stmt = $conn->prepare("UPDATE photography SET title=?, cover=?, images=?, comment_enabled=?, created_at=? WHERE id=?");
         } catch (Throwable $e) {
-            die("Database error: " . htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8'));
+            echo json_encode(['error' => 'Database error: ' . $e->getMessage()], JSON_UNESCAPED_SLASHES);
+            exit();
         }
         $stmt->bind_param("sssisi", $title, $cover, $images_json, $comment_enabled, $created_at, $id);
         if ($stmt->execute()) {
-            header("Location: photography-add.php?id=$id&msg=saved");
+            echo json_encode(['success' => true, 'redirect' => "photography-add.php?id=$id&msg=saved"], JSON_UNESCAPED_SLASHES);
             exit();
         }
     } else {
         try {
             $stmt = $conn->prepare("INSERT INTO photography (title, cover, images, comment_enabled, created_at) VALUES (?, ?, ?, ?, ?)");
         } catch (Throwable $e) {
-            die("Database error: " . htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8'));
+            echo json_encode(['error' => 'Database error: ' . $e->getMessage()], JSON_UNESCAPED_SLASHES);
+            exit();
         }
         $stmt->bind_param("sssis", $title, $cover, $images_json, $comment_enabled, $created_at);
         if ($stmt->execute()) {
-            header("Location: photography-add.php?id=".$stmt->insert_id."&msg=added");
+            echo json_encode(['success' => true, 'redirect' => "photography-add.php?id=" . $stmt->insert_id . "&msg=added"], JSON_UNESCAPED_SLASHES);
             exit();
         }
     }
-    echo "<script>Uigg.alert('Failed: " . addslashes($conn->error) . " !')</script>";
+    echo json_encode(['error' => 'Failed: ' . addslashes($conn->error)], JSON_UNESCAPED_SLASHES);
+    exit();
+}
+
+include ('head.php');
+
+// GET: query row for form display
+$row = null;
+if ($id) {
+    $row_stmt = $conn->prepare("SELECT * FROM photography WHERE id = ?");
+    $row_stmt->bind_param('i', $id);
+    $row_stmt->execute();
+    $row = $row_stmt->get_result()->fetch_assoc();
+    $row_stmt->close();
 }
 
 $title_val = htmlspecialchars($row['title'] ?? '', ENT_QUOTES, 'UTF-8');
 $cover_val = $row['cover'] ?? '';
 $images_val = extractImageUrlsFromJson($row['images'] ?? '');
-$comment_active = ($row && !$row['comment_enabled']) ? '' : ' active';
-$comment_val = ($row && !$row['comment_enabled']) ? 0 : 1;
+$comment_enabled_bool = $row ? (bool)$row['comment_enabled'] : true;
 $date_val = $row ? substr($row['created_at'], 0, 10) : date('Y-m-d');
 $heading = $id ? 'photography edit' : 'photography add';
 $msg = $_GET['msg'] ?? '';
@@ -130,148 +148,56 @@ if ($msg) $msg_text = $msg === 'added' ? 'Added successfully !' : 'Saved success
 <div class="contant">
     <div class="title"><h5><?php echo $heading; ?></h5></div>
     <div class="item">
-        <section class="form">
-            <form method="POST" enctype="multipart/form-data">
-                <?php if ($id): ?><input type="hidden" name="id" value="<?php echo $id; ?>"><?php endif; ?>
-                <li><label>title</label><input class="wide-80" type="text" name="title" value="<?php echo $title_val; ?>" required></li>
-                <li><label>date</label><input class="wide-20" type="date" name="created_at" value="<?php echo $date_val; ?>"></li>
-                <li><label>comment</label><label><o class="toggle<?php echo $comment_active; ?>"></o><input type="hidden" name="comment_enabled" value="<?php echo $comment_val; ?>"></label></li>
-                <li><label>cover</label>
-                    <div class="upload">
-                        <div class="ico upload-group" <?php if ($cover_val): ?>style="background-image: url('<?php echo htmlspecialchars($cover_val); ?>');color: transparent"<?php endif; ?>>
-                            <input type="file" name="cover" accept=".jpg,.jpeg,.png,.webp,.gif">
-                        </div>
-                    </div>
-                    <hint>500x500px</hint>
-                </li>
-                <li><label>album</label>
-                    <div class="upload wide">
-                        <!-- 上传以后的图片，每张图片都以这段代码显示，这段代码里，点击input是更换，点击n是删除，这些功能的前端效果已经有了，只要程序功能-->
-                        <?php foreach ($images_val as $image): ?>
-                        <div class="ico upload-group" style="background-image: url('<?php echo htmlspecialchars($image); ?>');color: transparent">
-                            <input type="hidden" name="images[]" value="<?php echo htmlspecialchars($image); ?>">
-                            <input type="file" name="replace_images[]" accept=".jpg,.jpeg,.png,.webp,.gif">
-                            <n class="ico"></n>
-                        </div>
-                        <?php endforeach; ?>
-                        <!-- 结束 -->
-                        <!-- 点击这个会上传多张图片 -->
-                        <div class="ico upload-group">
-                            <input type="file" name="photos[]" accept=".jpg,.jpeg,.png,.webp,.gif" multiple>
-                        </div>
-                        <!-- 结束 -->
-                    </div>
-                </li>
-                <li class="resolve"><button class="btn btn-submit">submit</button></li>
-            </form>
-        </section>
+        <form class="form" id="photographyForm" auto>
+            <?php if ($id): ?><input type="hidden" name="id" value="<?php echo $id; ?>"><?php endif; ?>
+            <item><alia>title</alia>
+                <cont><input class="wide-80" type="text" name="title" value="<?php echo $title_val; ?>" required></cont>
+            </item>
+            <item><alia>date</alia>
+                <cont><input class="wide-20" type="date" name="created_at" value="<?php echo $date_val; ?>"></cont>
+            </item>
+            <item><alia>comment</alia>
+                <cont><o class="toggle" name="comment_enabled"></o></cont>
+            </item>
+            <item><alia>cover</alia>
+                <cont><images name="cover"></images></cont>
+                <hint>500x500px</hint>
+            </item>
+            <item><alia>album</alia>
+                <cont><images multiple name="images"></images></cont>
+            </item>
+            <item><alia></alia>
+                <cont><a class="btn" submit>submit</a></cont>
+            </item>
+        </form>
     </div>
 </div>
 
 <script type="module">
-    const { $, $$, alert } = Uigg
+    const { $, alert } = Uigg
     var message = <?php echo json_encode($msg ? $msg_text : '', JSON_UNESCAPED_SLASHES); ?>;
     ready(() => {
         if (message) {
             alert(message)
-            history.replaceState(null,'',location.pathname+location.search.replace(/&?msg=\w+/,''))
-        }
-        const photosInput = $('input[name="photos[]"]')
-        let selectedPhotos = []
-
-        function refreshPhotosInput(){
-            const dt = new DataTransfer()
-            selectedPhotos.forEach(f => dt.items.add(f))
-            photosInput.files = dt.files
+            history.replaceState(null, '', location.pathname + location.search.replace(/&?msg=\w+/, ''))
         }
 
-        function renderSelectedPhotos(){
-            $$('.upload-group[data-new-index]').forEach(el => el.remove())
-            selectedPhotos.forEach((file, i) => {
-                const reader = new FileReader()
-                reader.onload = e => {
-                    const div = document.createElement('div')
-                    div.className = 'ico upload-group'
-                    div.setAttribute('data-new-index', i)
-                    div.style.backgroundImage = `url("${e.target.result}")`
-                    div.style.color = 'transparent'
-                    div.innerHTML = '<input type="file" accept=".jpg,.jpeg,.png,.webp,.gif"><n class="ico"></n>'
-                    photosInput.closest('.upload-group').before(div)
-                }
-                reader.readAsDataURL(file)
-            })
+        const f = $('#photographyForm')
+
+        f.setData({
+            comment_enabled: <?php echo json_encode($comment_enabled_bool); ?>,
+            <?php if ($cover_val): ?>cover: <?php echo json_encode($cover_val, JSON_UNESCAPED_SLASHES); ?>,
+            <?php endif; ?>
+            <?php if (!empty($images_val)): ?>images: <?php echo json_encode($images_val, JSON_UNESCAPED_SLASHES); ?>,
+            <?php endif; ?>
+        })
+
+        f.onSubmit = async (data) => {
+            const resp = await fetch('photography-add.php', { method: 'POST', body: f.toFormData() })
+            const result = await resp.json().catch(() => ({ error: 'Server error' }))
+            if (result.success) location.href = result.redirect
+            else alert(result.error || 'Failed')
         }
-
-        // comment toggle: uigg.js toggles class after this runs, invert
-        $('o.toggle').addEventListener('click', function(){
-            $('input[name=comment_enabled]').value = this.classList.contains('active') ? 0 : 1
-        })
-
-        $$('.upload').forEach(upload => {
-            // click: delete image
-            upload.addEventListener('click', function(e){
-                const btn = e.target.closest('.upload-group n')
-                if (!btn) return
-                e.preventDefault()
-                const group = btn.closest('.upload-group')
-                const newIndex = group.getAttribute('data-new-index')
-                if (newIndex !== null) {
-                    selectedPhotos.splice(parseInt(newIndex), 1)
-                    refreshPhotosInput()
-                    group.remove()
-                    $$('.upload-group[data-new-index]').forEach((el, i) => {
-                        el.setAttribute('data-new-index', i)
-                    })
-                } else {
-                    group.remove()
-                }
-            })
-
-            // change: file preview & replace
-            upload.addEventListener('change', function(e){
-                const input = e.target
-                if (input.tagName !== 'INPUT' || input.type !== 'file') return
-                const group = input.closest('.upload-group')
-                if (!group) return
-
-                const newIndex = group.getAttribute('data-new-index')
-                if (newIndex !== null) {
-                    // replace newly added photo
-                    if (!input.files[0]) return
-                    selectedPhotos[parseInt(newIndex)] = input.files[0]
-                    refreshPhotosInput()
-                    const reader = new FileReader()
-                    reader.onload = ev => {
-                        group.style.backgroundImage = `url("${ev.target.result}")`
-                        group.style.color = 'transparent'
-                    }
-                    reader.readAsDataURL(input.files[0])
-                } else if (!input.multiple) {
-                    // cover or existing image preview
-                    const file = input.files[0]
-                    if (!file) return
-                    const reader = new FileReader()
-                    reader.onload = ev => {
-                        group.style.backgroundImage = `url("${ev.target.result}")`
-                        group.style.color = 'transparent'
-                    }
-                    reader.readAsDataURL(file)
-                }
-            })
-        })
-
-        // add new photos
-        photosInput.addEventListener('change', function(){
-            const addGroup = this.closest('.upload-group')
-            selectedPhotos = selectedPhotos.concat(Array.from(this.files))
-            refreshPhotosInput()
-            renderSelectedPhotos()
-            // uigg.js sets blob async on add-btn group; clear after event loop
-            setTimeout(() => {
-                addGroup.style.backgroundImage = ''
-                addGroup.style.color = ''
-            }, 0)
-        })
     })
 </script>
 

@@ -77,13 +77,11 @@ $csrf = csrfToken();
 <div class="contant">
     <div class="title"><h5>comment list</h5></div>
     <div class="item">
-        <div class="form filter">
-            <form method="GET">
-                <input type="hidden" name="page" value="1">
-                <li><input type="text" name="keyword" value="<?php echo htmlspecialchars($keyword); ?>"></li>
-                <li><button class="btn">search</button></li>
-            </form>
-        </div>
+        <form class="form filter" method="GET">
+            <input type="hidden" name="page" value="1">
+            <item><cont><input type="text" name="keyword" value="<?php echo htmlspecialchars($keyword); ?>"></cont></item>
+            <item><cont><button class="btn">search</button></cont></item>
+        </form>
         <table  class="table">
             <thead>
                 <tr><th>ID</th><td>name</td><td>email</td><td>comment</td><td>type</td><td>time</td><td>display</td><td>control</td></tr>

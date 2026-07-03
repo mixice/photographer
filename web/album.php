@@ -1,5 +1,6 @@
 <?php
-include ('head.php');
+if (!file_exists(__DIR__ . '/install.lock')) { header('Location: install.php'); exit(); }
+require_once('db.php');
 require_once __DIR__ . '/includes/comment.php';
 
 $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
@@ -41,6 +42,8 @@ $comment_msg = $_GET['msg'] ?? '';
 extract(getCommentPagination($conn, 'photography', $id));
 $comment_form_action = "album.php?id=$id";
 $comment_pagination_base = "album.php?id=$id";
+
+include ('head.php');
 ?>
 
 <section class="article">

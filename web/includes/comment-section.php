@@ -33,16 +33,27 @@
 <?php endif; ?>
 
 <?php if (!empty($comment_msg)): ?>
-<script>
+<script type="module">
+    (function () {
     var msgs = {
         'commented': 'Comment submitted !',
         'csrf_fail': 'Invalid request, please refresh and retry',
         'rate_limited': 'Please wait a moment before commenting again'
     };
     var msgKey = <?php echo json_encode($comment_msg, JSON_UNESCAPED_SLASHES); ?>;
-    if (msgs[msgKey]) {
-        Uigg.alert(msgs[msgKey])
-        history.replaceState(null,'',location.pathname+location.search.replace(/&?msg=\w+/,''))
-    }
+    var showCommentMessage = function () {
+        if (!msgs[msgKey]) return;
+        if (window.Uigg && typeof Uigg.alert === 'function') Uigg.alert(msgs[msgKey]);
+        else window.alert(msgs[msgKey]);
+
+        var params = new URLSearchParams(location.search);
+        params.delete('msg');
+        var query = params.toString();
+        history.replaceState(null, '', location.pathname + (query ? '?' + query : ''));
+    };
+
+    if (document.readyState === 'complete') showCommentMessage();
+    else window.addEventListener('load', showCommentMessage);
+    }());
 </script>
 <?php endif; ?>
