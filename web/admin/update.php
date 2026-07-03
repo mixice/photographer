@@ -1,5 +1,25 @@
 <?php
-include ('head.php');
+if (!file_exists(dirname(__DIR__) . '/install.lock')) {
+    header('Location: ../install.php');
+    exit();
+}
+require_once('../db.php');
+
+if (isset($_GET['action']) && $_GET['action'] === 'logout') {
+    session_unset();
+    session_destroy();
+    header('Location: login.php');
+    exit();
+}
+
+if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+    header('Location: login.php');
+    exit();
+}
+
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+header('Pragma: no-cache');
+header('Expires: 0');
 
 $version_file = dirname(__DIR__) . '/version.json';
 $local = ['version' => '0.0.0', 'build' => ''];
@@ -34,28 +54,22 @@ if ($action === 'check') {
         $message = updateRequirementMessage($missing);
         $message_type = 'error';
     } else {
-        $ctx = stream_context_create(['http' => ['timeout' => 15, 'user_agent' => 'Photographer-Updater/1.0']]);
-        $json = @file_get_contents($raw_url, false, $ctx);
-        if ($json === false) {
-            $message = 'Cannot connect to GitHub. Please check your network or DNS.';
+        $remote_error = '';
+        $remote = fetchRemoteVersion($raw_url, $remote_error);
+        if (!$remote) {
+            $message = $remote_error;
             $message_type = 'error';
-        } else {
-            $remote = json_decode($json, true);
-            if (!$remote || empty($remote['version'])) {
-                $message = 'Remote version info is malformed.';
-                $message_type = 'error';
-            } elseif (version_compare($remote['version'], $local['version'], '>')) {
-                if ($can_update) {
-                    $message = 'New version found: ' . htmlspecialchars($remote['version']);
-                    $message_type = 'success';
-                } else {
-                    $message = 'New version found: ' . htmlspecialchars($remote['version']) . ', but ' . updateRequirementMessage(updateRequirementErrors(true));
-                    $message_type = 'error';
-                }
+        } elseif (version_compare($remote['version'], $local['version'], '>')) {
+            if ($can_update) {
+                $message = 'New version found: ' . htmlspecialchars($remote['version']);
+                $message_type = 'success';
             } else {
-                $message = 'You are already on the latest version ' . htmlspecialchars($local['version']);
-                $message_type = 'info';
+                $message = 'New version found: ' . htmlspecialchars($remote['version']) . ', but ' . updateRequirementMessage(updateRequirementErrors(true));
+                $message_type = 'error';
             }
+        } else {
+            $message = 'You are already on the latest version ' . htmlspecialchars($local['version']);
+            $message_type = 'info';
         }
     }
 }
@@ -71,11 +85,13 @@ if ($action === 'update') {
     } else {
         // download
         $tmp_zip = sys_get_temp_dir() . '/photographer_update_' . time() . '.zip';
-        $ctx = stream_context_create(['http' => ['timeout' => 60, 'user_agent' => 'Photographer-Updater/1.0']]);
-        $zip_data = @file_get_contents($zip_url, false, $ctx);
+        $zip_data = @file_get_contents(cacheBustedUrl($zip_url), false, updateHttpContext(60));
 
         if ($zip_data === false) {
             $message = 'Failed to download update package. Check your network.';
+            $message_type = 'error';
+        } elseif (substr($zip_data, 0, 2) !== 'PK') {
+            $message = 'Downloaded update package is not a valid ZIP file. Please try again later.';
             $message_type = 'error';
         } elseif (file_put_contents($tmp_zip, $zip_data) === false) {
             $message = 'Failed to write temp file. Check disk permissions.';
@@ -186,6 +202,14 @@ if (file_exists($version_file)) {
     $local = json_decode(file_get_contents($version_file), true) ?: $local;
 }
 
+if ($action === 'update' && empty(updateRequirementErrors(false))) {
+    $remote_error = '';
+    $fresh_remote = fetchRemoteVersion($raw_url, $remote_error);
+    if ($fresh_remote) {
+        $remote = $fresh_remote;
+    }
+}
+
 function deleteDir($dir) {
     if (!is_dir($dir)) return;
     $items = new RecursiveIteratorIterator(
@@ -196,6 +220,36 @@ function deleteDir($dir) {
         $item->isDir() ? rmdir($item) : unlink($item);
     }
     rmdir($dir);
+}
+
+function updateHttpContext($timeout) {
+    return stream_context_create([
+        'http' => [
+            'timeout' => $timeout,
+            'user_agent' => 'Photographer-Updater/1.0',
+            'header' => "Cache-Control: no-cache\r\nPragma: no-cache\r\n",
+        ],
+    ]);
+}
+
+function cacheBustedUrl($url) {
+    return $url . (strpos($url, '?') === false ? '?' : '&') . '_=' . time();
+}
+
+function fetchRemoteVersion($url, &$error = '') {
+    $json = @file_get_contents(cacheBustedUrl($url), false, updateHttpContext(15));
+    if ($json === false) {
+        $error = 'Cannot connect to GitHub. Please check your network or DNS.';
+        return null;
+    }
+
+    $remote = json_decode($json, true);
+    if (!is_array($remote) || empty($remote['version'])) {
+        $error = 'Remote version info is malformed.';
+        return null;
+    }
+
+    return $remote;
 }
 
 function updateRequirementErrors($need_zip = false) {
@@ -220,6 +274,7 @@ function updateRequirementMessage($errors) {
 }
 
 $js_msg = json_encode($message, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_SLASHES);
+include ('head.php');
 ?>
 
 <div class="title"><h4>system update</h4></div>
