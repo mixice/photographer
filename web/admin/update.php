@@ -40,7 +40,9 @@ $remote = null;
 $csrf = csrfToken();
 $can_update = empty(updateRequirementErrors(true));
 
-$action = $_GET['action'] ?? ($_POST['action'] ?? '');
+$action = $_SERVER['REQUEST_METHOD'] === 'POST'
+    ? ($_POST['action'] ?? '')
+    : ($_GET['action'] ?? '');
 
 if ($action === '' && !$can_update) {
     $message = updateRequirementMessage(updateRequirementErrors(true));
@@ -296,7 +298,7 @@ include ('head.php');
         </div>
         <div class="form">
             <?php if ($remote && $can_update && version_compare($remote['version'], $local['version'], '>')): ?>
-            <form method="POST" id="update-form">
+            <form method="POST" action="update.php" id="update-form">
                 <input type="hidden" name="action" value="update">
                 <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf, ENT_QUOTES, 'UTF-8'); ?>">
                 <button type="submit" class="btn co-green">update to v<?php echo htmlspecialchars($remote['version']); ?></button>
