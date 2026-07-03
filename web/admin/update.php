@@ -176,22 +176,19 @@ $js_msg = json_encode($message);
 
         <div class="article">
             <li>
-                <span>Current version</span>
-                <span class="co-sapphire"><strong>v<?php echo htmlspecialchars($local['version']); ?></strong></span>
-            </li>
-            <li>
-                <span>Build date</span>
-                <span><?php echo htmlspecialchars($local['build'] ?? '-'); ?></span>
+                <span>Current version: </span>
+                <span><?php echo htmlspecialchars($local['version']); ?></span>
+                <span>(<?php echo htmlspecialchars($local['build'] ?? '-'); ?>)</span>
             </li>
             <?php if ($remote): ?>
             <li>
-                <span>remote version</span>
-                <span class="<?php echo version_compare($remote['version'], $local['version'], '>') ? 'co-green' : ''; ?>"><strong>v<?php echo htmlspecialchars($remote['version']); ?></strong></span>
+                <span>Remote version: </span>
+                <span><?php echo htmlspecialchars($remote['version']); ?></span>
+                <span>(<?php echo htmlspecialchars($remote['build'] ?? '-'); ?>)</span>
             </li>
             <?php endif; ?>
         </div>
-
-        <div class="form" style="margin-top:16px">
+        <div class="form">
             <?php if ($remote && version_compare($remote['version'], $local['version'], '>')): ?>
             <form method="POST" id="update-form">
                 <input type="hidden" name="action" value="update">
@@ -201,17 +198,16 @@ $js_msg = json_encode($message);
             <a href="?action=check" class="btn btn-submit">check for updates</a>
             <?php endif; ?>
         </div>
-
-        <reminder style="margin-top:16px">
+        <reminder>
             <p>Protected files: db.php, uploads/, install.lock</p>
-            <p>Update source: GitHub raw (raw.githubusercontent.com)</p>
+            <p>Update source: <a href="https://github.com/mixice/photographer" target="_blank"><u>https://github.com/mixice/photographer</u></a></p>
         </reminder>
     </div>
 </div>
 
 <?php if ($message): ?>
-<script>
-    ready(function () {
+<script type="module">
+    ready(function (){
         Uigg.alert('<?php echo $js_msg; ?>')
     })
 </script>

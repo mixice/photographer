@@ -36,19 +36,6 @@ $comment_count = $conn->query("SELECT COUNT(*) FROM comment WHERE status = 0")->
                 <li>If you have any questions, please contact mixice@mixice.com</li>
             </ul>
         </div>
-        <?php
-        $version_text = '无法连接';
-        $vf = dirname(__DIR__) . '/version.json';
-        if (file_exists($vf)) {
-            $ver = json_decode(file_get_contents($vf), true);
-            if ($ver && !empty($ver['version'])) {
-                $version_text = $ver['version'] . ' (' . ($ver['build'] ?? '?') . ')';
-            }
-        }
-        ?>
-        <reminder>
-            Version <?php echo htmlspecialchars($version_text); ?>
-        </reminder>
     </div>
 </div>
 
