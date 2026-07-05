@@ -32,7 +32,7 @@ if (!empty($keyword)) {
 
 $total = countWhere($conn, 'photography', $where, $count_types, $params);
 $offset = ($current_page - 1) * $page_size;
-$list_sql = "SELECT id, title, cover, created_at FROM photography WHERE $where ORDER BY created_at DESC LIMIT $offset, $page_size";
+$list_sql = "SELECT id, title, cover, created_at FROM photography WHERE $where ORDER BY created_at DESC, id DESC LIMIT $offset, $page_size";
 
 if (!empty($params)) {
     $stmt = $conn->prepare($list_sql);

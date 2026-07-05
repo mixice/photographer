@@ -50,7 +50,7 @@ function getCommentPagination($conn, $target_type, $target_id, $page_size = 10, 
     $comment_pages = max(1, ceil($total_comments / $page_size));
     $comment_offset = ($comment_page - 1) * $page_size;
 
-    $list_stmt = $conn->prepare("SELECT id, name, email, content, created_at FROM comment WHERE target_type=? AND target_id=? AND status=1 ORDER BY created_at DESC LIMIT ?, ?");
+    $list_stmt = $conn->prepare("SELECT id, name, email, content, created_at FROM comment WHERE target_type=? AND target_id=? AND status=1 ORDER BY created_at DESC, id DESC LIMIT ?, ?");
     $list_stmt->bind_param('siii', $target_type, $target_id, $comment_offset, $page_size);
     $list_stmt->execute();
     $comment_list = $list_stmt->get_result();

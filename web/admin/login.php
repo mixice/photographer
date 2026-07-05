@@ -21,10 +21,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             header("Location: index.php");
             exit();
         } else {
-            $_SESSION['error'] = 1;
+            $login_error = true;
         }
     } else {
-        $_SESSION['error'] = 1;
+        $login_error = true;
     }
     $stmt->close();
 }
@@ -61,12 +61,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <form class="form login-form" method="POST">
                 <item><i class="ico ico-user"></i><cont><input type="text" name="account" required></cont></item>
                 <item><i class="ico ico-password"></i><cont><div class="input"><input type="password" name="password" required><o class="password"></o></div></cont></item>
-                <div class="bloomer" <?php if(isset($_SESSION['error'])){echo 'show';unset($_SESSION['error']);} ?>>Account and password is error</div>
                 <item><cont><button type="submit" class="btn">login</button></cont></item>
             </form>
         </div>
     </div>
 </section>
+
+<?php if(isset($login_error)): ?>
+<script type="module">
+if (window.Uigg) Uigg.alert('Account and password is error')
+</script>
+<?php endif; ?>
 
 </body>
 </html>

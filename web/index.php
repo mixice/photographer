@@ -8,9 +8,9 @@ $photography_ticket = $settings['photography_ticket'] ?? '';
 $standpoint_ticket = $settings['standpoint_ticket'] ?? '';
 $comment_ticket = $settings['comment_ticket'] ?? '';
 
-$photos = db()->query("SELECT id, title, cover, created_at FROM photography ORDER BY created_at DESC LIMIT 30");
-$articles = db()->query("SELECT id, title, cover, content, created_at FROM standpoint ORDER BY created_at DESC LIMIT 2");
-$comments = db()->query("SELECT id, name, content, created_at FROM comment WHERE status=1 ORDER BY created_at DESC LIMIT 5");
+$photos = db()->query("SELECT id, title, cover, created_at FROM photography ORDER BY created_at DESC, id DESC LIMIT 30");
+$articles = db()->query("SELECT id, title, cover, content, created_at FROM standpoint ORDER BY created_at DESC, id DESC LIMIT 2");
+$comments = db()->query("SELECT id, name, content, created_at FROM comment WHERE status=1 ORDER BY created_at DESC, id DESC LIMIT 5");
 ?>
 
 <section class="light">

@@ -43,7 +43,7 @@ if (!empty($keyword)) {
 
 $total = countWhere($conn, 'comment', $where, $count_types, $params);
 $offset = ($current_page - 1) * $page_size;
-$list_sql = "SELECT id, name, email, content, target_type, target_id, status, created_at FROM comment WHERE $where ORDER BY created_at DESC LIMIT $offset, $page_size";
+$list_sql = "SELECT id, name, email, content, target_type, target_id, status, created_at FROM comment WHERE $where ORDER BY created_at DESC, id DESC LIMIT $offset, $page_size";
 
 if (!empty($params)) {
     $stmt = $conn->prepare($list_sql);

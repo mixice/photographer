@@ -26,13 +26,13 @@ if (!$row) {
     exit();
 }
 
-$prev_stmt = $conn->prepare("SELECT id, title FROM standpoint WHERE id < ? ORDER BY id DESC LIMIT 1");
-$prev_stmt->bind_param('i', $id);
+$prev_stmt = $conn->prepare("SELECT id, title FROM standpoint WHERE created_at < ? OR (created_at = ? AND id < ?) ORDER BY created_at DESC, id DESC LIMIT 1");
+$prev_stmt->bind_param('ssi', $row['created_at'], $row['created_at'], $id);
 $prev_stmt->execute();
 $prev = $prev_stmt->get_result()->fetch_assoc();
 $prev_stmt->close();
-$next_stmt = $conn->prepare("SELECT id, title FROM standpoint WHERE id > ? ORDER BY id ASC LIMIT 1");
-$next_stmt->bind_param('i', $id);
+$next_stmt = $conn->prepare("SELECT id, title FROM standpoint WHERE created_at > ? OR (created_at = ? AND id > ?) ORDER BY created_at ASC, id ASC LIMIT 1");
+$next_stmt->bind_param('ssi', $row['created_at'], $row['created_at'], $id);
 $next_stmt->execute();
 $next = $next_stmt->get_result()->fetch_assoc();
 $next_stmt->close();

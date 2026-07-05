@@ -8,7 +8,7 @@ $page_size = 30;
 $current_page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
 $total = $conn->query("SELECT COUNT(*) FROM photography")->fetch_row()[0];
 $offset = ($current_page - 1) * $page_size;
-$list_stmt = $conn->prepare("SELECT id, title, cover, created_at FROM photography ORDER BY created_at DESC LIMIT ?, ?");
+$list_stmt = $conn->prepare("SELECT id, title, cover, created_at FROM photography ORDER BY created_at DESC, id DESC LIMIT ?, ?");
 $list_stmt->bind_param('ii', $offset, $page_size);
 $list_stmt->execute();
 $list = $list_stmt->get_result();
