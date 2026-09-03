@@ -226,7 +226,7 @@ article {font-size: 16px;
     }
     menu {
         x.ico {display: block;width: 50px;height: 50px;line-height: 50px;font-size: 32px;}
-        menu-cont {position: absolute;left:0;top: 120px;background-color: var(--000-9);width: 100vw;display: none;
+        menu-cont {position: absolute;left:0;background-color: var(--000-9);width: 100vw;display: none;
             li {width: 100%;height: auto;display: block;overflow: hidden;
                 &:not(:last-child) {border-bottom: 1px var(--333) solid;}
                 a {color: white;line-height: 40px;}
