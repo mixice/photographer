@@ -1,22 +1,16 @@
-ready(()=>{
-    const { $ } = Uigg
-    // sider toggle
-    var siderToggle = $('.sider-toggle')
-    if (siderToggle) {
-        siderToggle.addEventListener('click', function(){
-            var sider = $('.sider')
-            if (sider) sider.style.display = sider.style.display === 'none' ? '' : 'none'
-        })
-    }
-
-    var localUrl = window.location.href,
-        pageAllName = localUrl.substring(localUrl.lastIndexOf('/') + 1),
-        pageName = pageAllName.substring(0, pageAllName.indexOf('.'))
-    var link = $('.sider a[href="'+pageName+'.php"]')
-    if (link) {
-        var foldGroup = link.closest('fold-group')
-        if (foldGroup) foldGroup.classList.add('active')
-    }
+ready(() => {
+	const { $, $$ } = Uigg
+	$$('.sider-toggle').forEach(el => {
+		el.addEventListener('click', () => {
+			const sider = $('.sider')
+			sider.style.display = sider.offsetParent ? 'none' : 'block'
+		})
+	})
+	const pageName = location.pathname.split('/').pop().split('.')[0]
+	$$(`.sider a[href="${pageName}.php"]`).forEach(el => {
+		const group = el.closest('fold-group')
+		if (group) group.classList.add('active')
+	})
 
     // editor image max-width fix
     var t = setInterval(function(){
