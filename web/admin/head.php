@@ -23,7 +23,6 @@ $site_title = htmlspecialchars($settings['title'] ?? 'Admin', ENT_QUOTES, 'UTF-8
 <html>
 <head>
 <meta charset="utf-8">
-<meta http-equiv="window-target" content="_top">
 <meta name="keywords" content="">
 <meta name="description" content="">
 <meta name="author" content="">
