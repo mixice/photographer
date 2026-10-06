@@ -26,8 +26,6 @@ $slug = $_GET['slug'] ?? '';
 <link rel="stylesheet" href="styles/styles.css">
 
 <script type="module" src="//ui.gg/lib/uigg.js"></script>
-
-<script defer src="//u.mssay.com/script.js" data-website-id="ebe5c624-85c8-429a-b492-03563b176328"></script>
 </head>
 
 <body>
