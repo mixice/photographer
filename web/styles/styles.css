@@ -16,11 +16,12 @@
 }
 
 /* light */
-.light {width: 100%; height: 100vh; position: relative; color: white; overflow: hidden;
+.light {width: 100%; height: 100vh; position: relative; color: white; overflow: hidden;background-color: black;
     a {color: white;}
     &::after {width: 100%; height: 100%; position: absolute; left: 0; top: 0; background-color: var(--111); opacity: .3; content: ''; z-index: -1;}
     swiper {z-index: -2;}
     .ticket {animation-delay: 2.5s;}
+    video {width: 100%;height: 100%;opacity: .8;position: absolute;left: 0;top: 0;}
     .light-logo {width: 70px; height: 70px; margin: 30px auto; animation-delay: .5s;
         i {font-size: 70px;}
     }
@@ -32,7 +33,7 @@
         a.ico {font-size: 30px; width: 40px; height: 40px; display: flex; align-items: center;}
         a:hover {transform: rotateY(180deg);}
     }
-    .light-next {margin: 30px auto; width: 30px; height: 30px;
+    .light-next {margin: 30px auto; width: 30px; height: 30px;display: flex;align-items: center;justify-content: center;
         i {animation-duration: 2s; animation-delay: 2s;}
     }
 }

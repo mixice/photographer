@@ -16,7 +16,7 @@ $comments = db()->query("SELECT id, name, content, created_at FROM comment WHERE
 <section class="light">
     <swiper loop autoplay="3">
         <swiper-wrapper>
-            <?php $pool = range(1, 20); $selected = array_rand($pool, 3); foreach($selected as $k) {echo '<swiper-slide><img src="images/light/' . $pool[$k] . '.jpg" cover loading="lazy"></swiper-slide>';}?>
+            <?php $pool = range(1, 20);shuffle($pool);$selected = array_slice($pool, 0, 3);foreach ($selected as $v) {echo '<swiper-slide><img src="images/light/' . $v . '.jpg" cover loading="lazy"></swiper-slide>';}?>
         </swiper-wrapper>
     </swiper>
     <?php if ($home_ticket): ?><div class="ticket absolute-5 center anime-fade-in-up"><?php echo sanitizeHtml($home_ticket); ?></div><?php endif; ?>

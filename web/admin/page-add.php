@@ -134,7 +134,7 @@ if ($msg) $msg_text = $msg === 'added' ? 'Added successfully !' : 'Saved success
                 <cont><textarea class="editor-upload" upload="upload.php" name="content"><?php echo $content_val; ?></textarea></cont>
             </item>
             <item><alia></alia>
-                <cont><a class="btn" submit id="btn-submit">submit</a></cont>
+                <cont><a class="btn btn-submit" submit id="btn-submit">submit</a></cont>
             </item>
         </form>
     </div>

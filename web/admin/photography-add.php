@@ -167,7 +167,7 @@ if ($msg) $msg_text = $msg === 'added' ? 'Added successfully !' : 'Saved success
                 <cont><images multiple name="images"></images></cont>
             </item>
             <item><alia></alia>
-                <cont><a class="btn" submit>submit</a></cont>
+                <cont><a class="btn btn-submit" submit>submit</a></cont>
             </item>
         </form>
     </div>

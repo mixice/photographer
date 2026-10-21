@@ -41,6 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="title"><h5>site setting</h5></div>
     <div class="item">
         <form class="form" id="setForm" auto>
+            <h5>basic</h5><br>
             <item><alia>title</alia>
                 <cont><input class="wide-30" type="text" name="title" value="<?php echo htmlspecialchars($settings['title'] ?? ''); ?>" required></cont>
             </item>
@@ -53,20 +54,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <item><alia>password</alia>
                 <cont><div class="input wide-20"><input type="password" name="password" placeholder="leave blank to keep" autocomplete="new-password"><o class="password"></o></div></cont>
             </item>
-            <item><alia>home ticket</alia>
+            <br><hr><br><h5>ticket</h5><br>
+            <item><alia>home</alia>
                 <cont><input class="wide-70" type="text" name="home_ticket" value="<?php echo htmlspecialchars($settings['home_ticket'] ?? ''); ?>" required></cont>
             </item>
-            <item><alia>photography ticket</alia>
+            <item><alia>photography</alia>
                 <cont><input class="wide-70" type="text" name="photography_ticket" value="<?php echo htmlspecialchars($settings['photography_ticket'] ?? ''); ?>" required></cont>
             </item>
-            <item><alia>standpoint ticket</alia>
+            <item><alia>standpoint</alia>
                 <cont><input class="wide-70" type="text" name="standpoint_ticket" value="<?php echo htmlspecialchars($settings['standpoint_ticket'] ?? ''); ?>" required></cont>
             </item>
-            <item><alia>comment ticket</alia>
+            <item><alia>comment</alia>
                 <cont><input class="wide-70" type="text" name="comment_ticket" value="<?php echo htmlspecialchars($settings['comment_ticket'] ?? ''); ?>" required></cont>
             </item>
             <item><alia></alia>
-                <cont><a class="btn" submit>submit</a></cont>
+                <cont><a class="btn btn-submit" submit>submit</a></cont>
             </item>
         </form>
     </div>
